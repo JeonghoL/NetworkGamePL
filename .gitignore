@@ -15,3 +15,6 @@ PEW & PEW/Engine/x64/Debug/Engine.pch
 *.ipdb
 *.idb
 PEW & PEW/x64/Debug/
+PEW & PEW/Output/Engine.lib
+PEW & PEW/Refactoring/x64/Release/Client.iobj
+PEW & PEW/x64/Release/Client.exe
