@@ -1,1 +1,136 @@
-﻿
+﻿  pch.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\External\include\GLFW\glfw3.h(3173,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  (소스 파일 'pch.cpp'을(를) 컴파일하는 중)
+  
+  Enemy.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(146,46): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Enemy.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(147,77): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Enemy.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Enemy.cpp(196,50): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Enemy.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Enemy.cpp(216,50): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Enemy.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Enemy.cpp(265,49): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Enemy.cpp'을(를) 컴파일하는 중)
+  
+  AnimatedModel.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(146,46): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/AnimatedModel.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(147,77): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/AnimatedModel.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.cpp(40,29): warning C4267: '초기화 중': 'size_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/AnimatedModel.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.cpp(331,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  (소스 파일 '/AnimatedModel.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.cpp(345,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  (소스 파일 '/AnimatedModel.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.cpp(446,19): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/AnimatedModel.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.cpp(447,17): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/AnimatedModel.cpp'을(를) 컴파일하는 중)
+  
+  Bullet.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(146,46): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Bullet.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(147,77): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Bullet.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Bullet.cpp(243,43): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Bullet.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Bullet.cpp(254,43): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Bullet.cpp'을(를) 컴파일하는 중)
+  
+  Camera.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Camera.cpp(48,31): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Camera.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Camera.cpp(49,31): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Camera.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Camera.cpp(71,23): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Camera.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\Camera.cpp(72,23): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Camera.cpp'을(를) 컴파일하는 중)
+  
+  Engine.cpp
+  EnginePch.cpp
+  GraphicsManager.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(146,46): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/GraphicsManager.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(147,77): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/GraphicsManager.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\GraphicsManager.cpp(55,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/GraphicsManager.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\GraphicsManager.cpp(55,45): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/GraphicsManager.cpp'을(를) 컴파일하는 중)
+  
+  Input.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(146,46): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Input.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(147,77): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/Input.cpp'을(를) 컴파일하는 중)
+  
+  MainCharacter.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(146,46): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\AnimatedModel.h(147,77): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(97,50): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(145,50): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(323,49): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(323,42): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(372,49): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(372,42): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(421,49): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\MainCharacter.cpp(421,42): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/MainCharacter.cpp'을(를) 컴파일하는 중)
+  
+  ShadowMapping.cpp
+  Skybox.cpp
+  StaticObject.cpp
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\StaticObject.cpp(120,43): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/StaticObject.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Engine\StaticObject.cpp(215,43): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 '/StaticObject.cpp'을(를) 컴파일하는 중)
+  
+  StaticObjectManager.cpp
+  stb_image.cpp
+  Timer.cpp
+  WindowInfo.cpp
+  코드를 생성하고 있습니다...
+  Engine.vcxproj -> C:\Users\Hadenpel\Desktop\Hadenpel\강의 자료\3-2\네트워크 게임 프로그래밍\NetworkGamePL\PEW & PEW\Output\Engine.lib
