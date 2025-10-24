@@ -11,6 +11,7 @@ PEW & PEW/Engine/x64/Debug/Engine.pch
 *.lastbuildstate
 *.pdb
 *.recipe
-*.lik
+*.ilk
 *.ipdb
 *.idb
+PEW & PEW/x64/Debug/
