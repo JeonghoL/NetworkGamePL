@@ -1,4 +1,1 @@
-﻿LINK : warning LNK4098: 'MSVCRT' defaultlib가 다른 라이브러리와 충돌합니다. /NODEFAULTLIB:library를 사용하십시오.
-  Refactoring.vcxproj -> C:\Users\alwjw\OneDrive\바탕 화면\StudyFolder\넷겜플\PEW & PEW\x64\Debug\Client.exe
-  'pwsh.exe'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
-  배치 파일이 아닙니다.
+﻿
