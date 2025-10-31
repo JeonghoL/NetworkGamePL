@@ -17,6 +17,9 @@ PEW & PEW/Engine/x64/Debug/Engine.pch
 PEW & PEW/x64/Debug/
 PEW & PEW/Output/Engine.lib
 PEW & PEW/Refactoring/x64/Release/Client.iobj
+PEW & PEW/Refactoring/x64/Release/Client.Build.CppClean.log
+PEW & PEW/Refactoring/x64/Release/Refactoring.vcxproj.FileListAbsolute.txt
+PEW & PEW/Refactoring/x64/Release/Client.tlog/link.command.1.tlog
 PEW & PEW/x64/Release/Client.exe
 
 *.ipch

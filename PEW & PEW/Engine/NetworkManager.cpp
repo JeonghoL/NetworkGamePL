@@ -59,8 +59,6 @@ void NetworkManager::Release()
 		isConnected = false;
 	}
 	WSACleanup();
-
-	cout << "Socket closed!" << endl;
 }
 
 bool NetworkManager::IsConnected() const
