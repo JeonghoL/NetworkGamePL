@@ -4,16 +4,25 @@
     <Filter Include="ServerCore">
       <UniqueIdentifier>{6d65d93c-75f7-4920-80d4-b5df07089d42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{a2a386c4-a210-4a37-910d-1e83f5850e9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServerCore.cpp">
       <Filter>ServerCore</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="IOThread.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerCore.h">
       <Filter>ServerCore</Filter>
+    </ClInclude>
+    <ClInclude Include="IOThread.h">
+      <Filter>Thread</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
