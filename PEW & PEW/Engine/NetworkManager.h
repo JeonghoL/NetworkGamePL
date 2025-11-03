@@ -1,4 +1,5 @@
 #pragma once
+#include "RecvBuffer.h"
 
 class NetworkManager
 {
@@ -10,10 +11,15 @@ public:
 	void Update();
 	void Release();
 
+	void Send(const std::vector<char>& packet);
+	void ProcessPacket(const std::vector<char>& packet);
+
 	bool IsConnected() const;
 
 private:
 	SOCKET clientSocket;
 	bool isConnected;
+
+	std::vector<char> recvBuffer;
 };
 
