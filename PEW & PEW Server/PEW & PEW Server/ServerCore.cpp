@@ -32,8 +32,11 @@ void ServerCore::AcceptLoop()
 	{
 		if (SOCKET clientSocket = accept(m_listenSocket, nullptr, nullptr))
 		{
-			// TODO : 빈 IOThread를 찾아서 연결
-			//        빈 IOThread가 없으면 접속 거부
+			if (IOThread* ioThread = GetIdleIOThread())
+				ioThread->Start(clientSocket);
+
+			else
+				closesocket(clientSocket);
 		}
 	}
 }
