@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 enum PacketType;
-class PacketHeader;
+struct PacketHeader;
 
 class GameThread {
 	using PacketHandler = std::function<void(std::pair<int, PacketHeader*>&)>;

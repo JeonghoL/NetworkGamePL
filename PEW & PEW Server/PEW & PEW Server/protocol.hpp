@@ -1,8 +1,27 @@
+#pragma once
 
-enum PacketType : char {
+#include <iostream>
+
+enum PacketType : uint8_t {
 	PT_TEMP = 0,
 };
 
-class PacketHeader {
+#pragma pack(push, 1)
 
+struct PacketHeader {
+	PacketType type;
+	uint8_t    size;
+
+	PacketHeader(PacketType t, uint8_t s)
+		: type(t), size(s) {}
 };
+
+struct TempPacket : public PacketHeader {
+	float x, y, z;
+
+	TempPacket(float x, float y, float z)
+		: PacketHeader(PacketType::PT_TEMP, sizeof(TempPacket)), 
+		x(x), y(y), z(z) {}
+};
+
+#pragma pack(pop)
