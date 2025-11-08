@@ -23,3 +23,5 @@ PEW & PEW/Refactoring/x64/Release/Client.tlog/link.command.1.tlog
 PEW & PEW/x64/Release/Client.exe
 
 *.ipch
+
+PEW & PEW Server/.vs/

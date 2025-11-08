@@ -12,6 +12,8 @@ public:
 	void Start(SOCKET socket);
 	void Stop();
 
+	bool IsRunning() const { return m_running; }
+		 
 private:
 	void Thread_Func();
 

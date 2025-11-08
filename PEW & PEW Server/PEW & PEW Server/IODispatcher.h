@@ -9,6 +9,12 @@ class PacketHeader;
 
 class IODispatcher {
 public:
+	static IODispatcher& Get()
+	{
+		static IODispatcher instance;
+		return instance;
+	}
+
 	void PushRecvPacket(int id, PacketHeader* packet);
 	void PushSendPacket(int id, PacketHeader* packet);
 	bool PopRecvPacket(std::pair<int, PacketHeader*>& out);

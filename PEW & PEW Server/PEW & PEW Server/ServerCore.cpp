@@ -37,4 +37,15 @@ void ServerCore::AcceptLoop()
 		}
 	}
 }
+
+IOThread* ServerCore::GetIdleIOThread()
+{
+	for (IOThread& ioThread : m_ioThreads)
+	{
+		if (!ioThread.IsRunning())
+			return &ioThread;
+	}
+
+	return nullptr;
+}
 														

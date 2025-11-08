@@ -2,5 +2,5 @@
 
 int main()
 {
-	ServerCore::GetInstance().Start();
+	ServerCore::Get().Start();
 }
