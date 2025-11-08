@@ -7,6 +7,9 @@
     <Filter Include="Thread">
       <UniqueIdentifier>{a2a386c4-a210-4a37-910d-1e83f5850e9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Protocol">
+      <UniqueIdentifier>{aa0370dc-3612-40ca-952b-4ecd69ce9438}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServerCore.cpp">
@@ -16,6 +19,10 @@
     <ClCompile Include="IOThread.cpp">
       <Filter>Thread</Filter>
     </ClCompile>
+    <ClCompile Include="GameThread.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="IODispatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerCore.h">
@@ -23,6 +30,13 @@
     </ClInclude>
     <ClInclude Include="IOThread.h">
       <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="GameThread.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="IODispatcher.h" />
+    <ClInclude Include="protocol.hpp">
+      <Filter>Protocol</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
