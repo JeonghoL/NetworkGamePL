@@ -9,7 +9,7 @@
 void Engine::Init()
 {
 	network = new NetworkManager();
-	network->Init("127.0.0.1", 9000);		// 동환이가 주는 IP & 포트번호 넣어야함
+	network->Init("127.0.0.1", PORT_NUM);		// 동환이가 주는 IP & 포트번호 넣어야함
 
 	GET_SINGLE(WindowInfo)->Init();
 	GET_SINGLE(Timer)->Init();
