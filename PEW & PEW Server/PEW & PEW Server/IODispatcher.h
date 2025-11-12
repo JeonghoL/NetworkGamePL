@@ -5,8 +5,6 @@
 
 using namespace concurrency;
 
-class PacketHeader;
-
 class IODispatcher {
 public:
 	static IODispatcher& Get()
@@ -15,13 +13,13 @@ public:
 		return instance;
 	}
 
-	void PushRecvPacket(int id, PacketHeader* packet);
-	void PushSendPacket(int id, PacketHeader* packet);
-	bool PopRecvPacket(std::pair<int, PacketHeader*>& out);
-	bool PopSendPacket(std::pair<int, PacketHeader*>& out);
+	void PushRecvPacket(size_t id, const std::vector<char>& packet);
+	//void PushSendPacket(size_t id, PacketHeader* packet);
+	bool PopRecvPacket(std::pair<size_t, std::vector<char>>& out);
+	//bool PopSendPacket(std::pair<size_t, PacketHeader*>& out);
 
 private:
-	concurrent_queue<std::pair<int, PacketHeader*>> m_recvQueue;
-	concurrent_queue<std::pair<int, PacketHeader*>> m_sendQueue;
+	concurrent_queue<std::pair<size_t, std::vector<char>>> m_recvQueue;
+	//concurrent_queue<std::pair<size_t, PacketHeader*>> m_sendQueue;
 };
 

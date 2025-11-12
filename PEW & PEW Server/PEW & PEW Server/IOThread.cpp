@@ -1,4 +1,8 @@
 #include "IOThread.h"
+#include "IODispatcher.h"
+#include "PacketFactory.h"
+
+#include <vector>
 
 IOThread::IOThread()
 	: m_clientSocket(INVALID_SOCKET), m_running(false)
@@ -31,4 +35,9 @@ void IOThread::Thread_Func()
 	//  1. recv() 
 	//  2. IODispatcher로 수신패킷 전달 
 	//  3. 송신해야할 패킷 있으면 send() 호출
+
+	//std::vector<char> buffer;
+	//recv(m_clientSocket, buffer.data(), /*Temp*/, 0);
+
+	//IODispatcher::Get().PushRecvPacket(m_clientSocket, buffer);
 }

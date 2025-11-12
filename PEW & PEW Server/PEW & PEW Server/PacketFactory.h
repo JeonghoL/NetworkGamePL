@@ -4,29 +4,30 @@
 #include <concepts>
 #include "protocol.hpp"
 
-template<typename T>
-concept Packet = std::is_base_of_v<PacketHeader, T>;
-
 struct PacketFactory {
 	static std::vector<char> SCLoginPacket();
 
 
-	template<Packet T>
-	static std::vector<char> Serialize(const T& packet)
+	template<typename Packet>
+	static std::vector<char> Serialize(const Packet& packet)
 	{
-		std::vector<char> out(sizeof(T));
-		std::memcpy(out.data(), &packet, sizeof(T));
+		static_assert(std::is_trivially_copyable_v<Packet>);
+
+		std::vector<char> out(sizeof(Packet));
+		std::memcpy(out.data(), &packet, sizeof(Packet));
 
 		return out;
 	}
 
-	template<Packet T>
-	static T Deserialize(const std::vector<char>& buf)
+	template<typename Packet>
+	static Packet Deserialize(const std::vector<char>& buf)
 	{
-		if (buf.size() < sizeof(T)) return T{};
+		static_assert(std::is_trivially_copyable_v<Packet>);
 
-		T packet;
-		std::memcpy(&packet, buf.data(), sizeof(T));
+		if (buf.size() < sizeof(Packet)) return Packet{};
+
+		Packet packet{};
+		std::memcpy(&packet, buf.data(), sizeof(Packet));
 
 		return packet;
 	}

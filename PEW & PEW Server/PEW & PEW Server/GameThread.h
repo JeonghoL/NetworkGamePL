@@ -5,11 +5,8 @@
 #include <functional>
 #include <unordered_map>
 
-enum PacketType;
-struct PacketHeader;
-
 class GameThread {
-	using PacketHandler = std::function<void(std::pair<int, PacketHeader*>&)>;
+	using PacketHandler = std::function<void(std::pair<int, std::vector<char>>&)>;
 
 public:
 	GameThread();
@@ -20,12 +17,12 @@ public:
 
 private:
 	void ThreadFunc();
-	void ProcessPacket(std::pair<int, PacketHeader*>& packetInfo);
+	void ProcessPacket(std::pair<int, std::vector<char>>& packetInfo);
 
-	void TestHandler(std::pair<int, PacketHeader*>& packetInfo);
+	void TestHandler(std::pair<int, std::vector<char>>& packetInfo);
 
 	std::thread m_thread;
-	std::unordered_map<PacketType, PacketHandler> m_handlerTable;
+	std::unordered_map<char, PacketHandler> m_handlerTable;
 
 	std::atomic<bool> m_running;
 };

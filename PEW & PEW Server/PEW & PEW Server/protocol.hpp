@@ -2,10 +2,11 @@
 
 #include <iostream>
 
-enum PacketType : uint8_t {
-	PT_TEMP,
+enum PacketType : char {
 	CS_LOGIN,
-	SC_LOGIN,
+
+
+	SC_LOGIN
 };
 
 template<>
@@ -19,25 +20,15 @@ struct std::hash<PacketType>
 
 #pragma pack(push, 1)
 
-struct PacketHeader {
-	PacketType type;
-	uint8_t    size;
-
-	PacketHeader(PacketType t, uint8_t s)
-		: type(t), size(s) {}
+struct CS_LOGIN_PACKET {
+	unsigned char size;
+	char type;
+	int textureId;
 };
 
-struct TempPacket : public PacketHeader {
-	float x, y, z;
-
-	TempPacket(float x, float y, float z)
-		: PacketHeader(PacketType::PT_TEMP, sizeof(TempPacket)), 
-		x(x), y(y), z(z) {}
-}; 
-
-struct SC_LOGIN_PACKET : public PacketHeader {
-	SC_LOGIN_PACKET() 
-		: PacketHeader(PacketType::SC_LOGIN, sizeof(SC_LOGIN_PACKET)) {}
+struct SC_LOGIN_PACKET {
+	unsigned char size;
+	char type;
 };
 
 #pragma pack(pop)
