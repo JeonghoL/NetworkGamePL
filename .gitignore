@@ -25,3 +25,4 @@ PEW & PEW/x64/Release/Client.exe
 *.ipch
 
 PEW & PEW Server/.vs/
+/PEW & PEW Server/x64/Debug
