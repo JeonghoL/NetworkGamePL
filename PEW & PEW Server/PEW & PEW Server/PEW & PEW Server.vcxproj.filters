@@ -23,6 +23,9 @@
       <Filter>Thread</Filter>
     </ClCompile>
     <ClCompile Include="IODispatcher.cpp" />
+    <ClCompile Include="PacketFactory.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerCore.h">
@@ -36,6 +39,9 @@
     </ClInclude>
     <ClInclude Include="IODispatcher.h" />
     <ClInclude Include="protocol.hpp">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketFactory.h">
       <Filter>Protocol</Filter>
     </ClInclude>
   </ItemGroup>
