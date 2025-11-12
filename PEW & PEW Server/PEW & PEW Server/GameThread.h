@@ -22,6 +22,8 @@ private:
 	void ThreadFunc();
 	void ProcessPacket(std::pair<int, PacketHeader*>& packetInfo);
 
+	void TestHandler(std::pair<int, PacketHeader*>& packetInfo);
+
 	std::thread m_thread;
 	std::unordered_map<PacketType, PacketHandler> m_handlerTable;
 

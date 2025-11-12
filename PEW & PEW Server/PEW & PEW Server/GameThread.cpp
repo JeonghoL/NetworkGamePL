@@ -1,13 +1,15 @@
 #include "GameThread.h"
+#include "protocol.hpp"
 
 GameThread::GameThread() : m_running(false)
 {
 	// TODO : 패킷 핸들러 등록
-	//
-	// 패킷 핸들러에서 수행해야할 것
-	//
-	// 1. PacketHeader*를 자신이 처리해야하는 구체 패킷 class로 casting
-	// 2. PacketType에 맞는 처리
+
+	m_handlerTable[CS_LOGIN] =
+		[this](std::pair<int, PacketHeader*>& packetInfo)
+		{
+			this->TestHandler(packetInfo);
+		};
 }
 
 void GameThread::Start()
@@ -35,8 +37,21 @@ void GameThread::ThreadFunc()
 
 void GameThread::ProcessPacket(std::pair<int, PacketHeader*>& packetInfo)
 {
-	// TODO : 패킷 처리 로직
+	const PacketType type = packetInfo.second->type;
+
+	auto it = m_handlerTable.find(type);
+	if (it != m_handlerTable.end())
+		it->second(packetInfo);
+
+	else
+		std::cout << "Unknown Packet Type: " << type << std::endl;
+}
+
+void GameThread::TestHandler(std::pair<int, PacketHeader*>& packetInfo)
+{
+	// 패킷 핸들러에서 수행해야할 것
 	//
-	// 1. PacketHeader* 에서 PacketType 확인
-	// 2. PacketType에 맞는 Handler 함수로 매핑
+	// 1. PacketHeader*를 자신이 처리해야하는 구체 패킷 class로 casting
+	// 2. PacketType에 맞는 처리
+	std::cout << "TestHandler" << std::endl;
 }
