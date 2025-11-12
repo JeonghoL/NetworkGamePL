@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "NetworkManager.h"
+#include "PacketFactory.h"
 
 NetworkManager::NetworkManager()
 {
@@ -145,6 +146,76 @@ void NetworkManager::Send(const std::vector<char>& packet)
 
 void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 {
+	if (packet.size() < 2) return;
+
+	char packetType = packet[1];
+	
+	switch (packetType) {
+		case SC_ADD:
+		{
+			SC_ADD_PACKET addPacket = PacketFactory::Deserialize<SC_ADD_PACKET>(packet);
+
+			break;
+		}
+		case SC_MOVE_OBJECT:
+		{
+			SC_MOVE_PACKET movePacket = PacketFactory::Deserialize<SC_MOVE_PACKET>(packet);
+
+			break;
+		}
+		case SC_REMOVE:
+		{
+			SC_REMOVE_PACKET removePacket = PacketFactory::Deserialize<SC_REMOVE_PACKET>(packet);
+
+			break;
+		}
+		case SC_ATTACK:
+		{
+			SC_ATTACK_PACKET attackPacket = PacketFactory::Deserialize<SC_ATTACK_PACKET>(packet);
+
+			break;
+		}
+		case SC_ATTACK_END:
+		{
+			SC_ATTACK_END_PACKET attackEndPacket = PacketFactory::Deserialize<SC_ATTACK_END_PACKET>(packet);
+
+			break;
+		}
+		case SC_DEAD:
+		{
+			SC_DEAD_PACKET deadPacket = PacketFactory::Deserialize<SC_DEAD_PACKET>(packet);
+
+			break;
+		}
+		case SC_REVIVE:
+		{
+			SC_REVIVE_PACKET revivePacket = PacketFactory::Deserialize<SC_REVIVE_PACKET>(packet);
+
+			break;
+		}
+		case SC_STAT_UPDATE:
+		{
+			SC_STAT_UPDATE_PACKET statPacket = PacketFactory::Deserialize<SC_STAT_UPDATE_PACKET>(packet);
+
+			break;
+		}
+		case SC_GAME_START:
+		{
+			SC_GAME_START_PACKET startPacket = PacketFactory::Deserialize<SC_GAME_START_PACKET>(packet);
+
+			break;
+		}
+		case SC_GAME_WIN:
+		{
+
+			break;
+		}
+		case SC_GAME_LOSE:
+		{
+
+			break;
+		}
+	}
 }
 
 bool NetworkManager::IsConnected() const
