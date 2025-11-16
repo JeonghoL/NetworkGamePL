@@ -6,6 +6,7 @@
 
 struct PacketFactory {
 	static std::vector<char> SCLoginPacket();
+	static std::vector<char> SCMovePacket(GameObject* obj);
 
 
 	template<typename Packet>

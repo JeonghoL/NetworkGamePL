@@ -59,14 +59,20 @@ struct vec3 {
 	}
 };
 
+enum ObjectType {
+	Character,
+	Projectile
+};
+
 class GameObject {
 public:
 	virtual ~GameObject() = default;
 
 	virtual void Update(const float dT) = 0;
 	virtual bool IsAlive() const = 0;
-	virtual int GetId() const = 0;
 
+	int id;
+	ObjectType type;
 	vec3 position;
 	size_t version{ 0 };
 };
