@@ -10,6 +10,9 @@
     <Filter Include="Protocol">
       <UniqueIdentifier>{aa0370dc-3612-40ca-952b-4ecd69ce9438}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{2841e129-bc01-4d43-8dc9-4ee30d4fb461}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServerCore.cpp">
@@ -25,6 +28,12 @@
     <ClCompile Include="IODispatcher.cpp" />
     <ClCompile Include="PacketFactory.cpp">
       <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -43,6 +52,12 @@
     </ClInclude>
     <ClInclude Include="PacketFactory.h">
       <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

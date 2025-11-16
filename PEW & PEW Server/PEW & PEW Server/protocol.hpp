@@ -9,15 +9,6 @@ enum PacketType : char {
 	SC_LOGIN
 };
 
-template<>
-struct std::hash<PacketType>
-{
-	std::uint8_t operator()(const PacketType& p) const noexcept
-	{
-		return static_cast<std::uint8_t>(p);
-	}
-};
-
 #pragma pack(push, 1)
 
 struct CS_LOGIN_PACKET {

@@ -127,18 +127,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameThread.h" />
     <ClInclude Include="IODispatcher.h" />
     <ClInclude Include="IOThread.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="PacketFactory.h" />
     <ClInclude Include="protocol.hpp" />
     <ClInclude Include="ServerCore.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameThread.cpp" />
     <ClCompile Include="IODispatcher.cpp" />
     <ClCompile Include="IOThread.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="PacketFactory.cpp" />
     <ClCompile Include="ServerCore.cpp" />
   </ItemGroup>

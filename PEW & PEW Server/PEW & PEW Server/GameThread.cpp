@@ -9,7 +9,13 @@ GameThread::GameThread() : m_running(false)
 	m_handlerTable[CS_LOGIN] =
 		[this](std::pair<int, std::vector<char>>& packetInfo)
 		{
-			this->TestHandler(packetInfo);
+			this->LoginHandler(packetInfo);
+		};
+
+	m_handlerTable[CS_MOVE] =
+		[this](std::pair<int, std::vector<char>>& packetInfo)
+		{
+			this->MoveHandler(packetInfo);
 		};
 }
 
@@ -29,11 +35,28 @@ void GameThread::Stop()
 
 void GameThread::ThreadFunc()
 {
-	// TODO : 게임 로직 처리 루프
-	//
-	// 1. 상태 Update
-	// 2. 충돌처리
-	// 3. etc...
+	using namespace std::chrono;
+
+	float accumlator{ 0.0f };
+	auto prev = steady_clock::now();
+	while (m_running)
+	{
+		auto now = steady_clock::now();
+		accumlator += duration<float>(now - prev).count();
+		prev = now;
+
+		while (accumlator >= TickTime)
+		{
+			// 1. 상태 Update
+			_objMng.Update(TickTime);
+
+			// 2. 충돌처리
+			// 3. etc...
+
+
+			accumlator -= TickTime;
+		}
+	}
 }
 
 void GameThread::ProcessPacket(std::pair<int, std::vector<char>>& packetInfo)
@@ -47,11 +70,21 @@ void GameThread::ProcessPacket(std::pair<int, std::vector<char>>& packetInfo)
 		std::cout << "Unknown Packet Type: " << type << std::endl;
 }
 
-void GameThread::TestHandler(std::pair<int, std::vector<char>>& packetInfo)
+void GameThread::LoginHandler(std::pair<int, std::vector<char>>& packetInfo)
 {
-	// 패킷 핸들러에서 수행해야할 것
-	//
-	// 1. 직렬화된 패킷을 자신이 처리해야하는 구체 패킷 class로 casting
-	// 2. PacketType에 맞는 처리
-	std::cout << "TestHandler" << std::endl;
+	std::cout << "LoginHandler" << std::endl;
 }
+
+void GameThread::MoveHandler(std::pair<int, std::vector<char>>& packetInfo)
+{
+	std::cout << "MoveHandler" << std::endl;
+}
+
+//void GameThread::TestHandler(std::pair<int, std::vector<char>>& packetInfo)
+//{
+//	// 패킷 핸들러에서 수행해야할 것
+//	//
+//	// 1. 직렬화된 패킷을 자신이 처리해야하는 구체 패킷 class로 casting
+//	// 2. PacketType에 맞는 처리
+//	std::cout << "TestHandler" << std::endl;
+//}
