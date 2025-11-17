@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "NetworkManager.h"
 #include "PacketFactory.h"
+#include "RemotePlayer.h"
 
 NetworkManager::NetworkManager()
 {
@@ -155,11 +156,26 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 		{
 			SC_ADD_PACKET addPacket = PacketFactory::Deserialize<SC_ADD_PACKET>(packet);
 
+			if (remotePlayers.find(addPacket.id) == remotePlayers.end()) {
+				RemotePlayer* newPlayer = new RemotePlayer(addPacket.id);
+				newPlayer->Init();
+				newPlayer->SetTargetPosition(addPacket.x, addPacket.y, addPacket.z);
+				remotePlayers[addPacket.id] = newPlayer;
+
+				cout << "[ADD PLAYER] ID: " << addPacket.id << " at (" <<
+					addPacket.x << ", " << addPacket.y << ", " << addPacket.z << ")" << endl;
+			}
+
 			break;
 		}
 		case SC_MOVE_OBJECT:
 		{
 			SC_MOVE_PACKET movePacket = PacketFactory::Deserialize<SC_MOVE_PACKET>(packet);
+
+			auto it = remotePlayers.find(movePacket.id);
+			if (it != remotePlayers.end()) {
+				it->second->UpdateFromPacket(movePacket.x, movePacket.y, movePacket.z);
+			}
 
 			break;
 		}
@@ -167,12 +183,25 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 		{
 			SC_REMOVE_PACKET removePacket = PacketFactory::Deserialize<SC_REMOVE_PACKET>(packet);
 
+			auto it = remotePlayers.find(removePacket.id);
+			if (it != remotePlayers.end()) {
+				delete it->second;
+				remotePlayers.erase(it);
+
+				cout << "[REMOVE PLAYER] ID: " << removePacket.id << endl;
+			}
+
 			break;
 		}
 		case SC_ATTACK:
 		{
 			SC_ATTACK_PACKET attackPacket = PacketFactory::Deserialize<SC_ATTACK_PACKET>(packet);
 
+			auto it = remotePlayers.find(attackPacket.id);
+			if (it != remotePlayers.end()) {
+				// 공격 애니메이션 처리
+				cout << "[ATTACK] Player ID: " << attackPacket.id << endl;
+			}
 			break;
 		}
 		case SC_ATTACK_END:

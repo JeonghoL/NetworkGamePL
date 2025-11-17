@@ -1,6 +1,8 @@
 #pragma once
 #include "RecvBuffer.h"
 
+class RemotePlayer;
+
 class NetworkManager
 {
 public:
@@ -16,10 +18,13 @@ public:
 
 	bool IsConnected() const;
 
+	const std::map<int, RemotePlayer*>& GetRemotePlayers() const { return remotePlayers; }
+
 private:
 	SOCKET clientSocket;
 	bool isConnected;
 
 	std::vector<char> recvBuffer;
+	std::map<int, RemotePlayer*> remotePlayers;
 };
 
