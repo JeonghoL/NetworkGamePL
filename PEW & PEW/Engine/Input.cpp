@@ -2,6 +2,8 @@
 #include "Input.h"
 #include "Camera.h"
 #include "MainCharacter.h"
+#include "NetworkManager.h"
+#include "PacketFactory.h"
 
 void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -47,10 +49,28 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 				if (action == GLFW_PRESS)
 				{
 					input->mainCat->SetRight_on(true);
+					
+					if (input->network) {
+						std::vector<char> packet = PacketFactory::CSMovePacket(RIGHT, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						cout << "[SEND] D key pressed!!" << endl;
+					}
 				}
 				else if (action == GLFW_RELEASE)
 				{
 					input->mainCat->SetRight_on(false);
+
+					if (input->network) {
+						// 일단 잠재적 오류를 베재하고 단순한 로직으로 구현
+						char currentDir = -1;
+						if (input->mainCat->GetTop()) currentDir = UP;
+						else if (input->mainCat->GetBottom()) currentDir = DOWN;
+						else if (input->mainCat->GetLeft()) currentDir = LEFT;
+
+						std::vector<char> packet = PacketFactory::CSMovePacket(currentDir, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						cout << "[SEND] D key released!!" << endl;
+					}
 				}
 			}
 			break;
@@ -60,10 +80,27 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 				if (action == GLFW_PRESS)
 				{
 					input->mainCat->SetLeft_on(true);
+
+					if (input->network) {
+						std::vector<char> packet = PacketFactory::CSMovePacket(LEFT, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						cout << "[SEND] A key pressed!!" << endl;
+					}
 				}
 				else if (action == GLFW_RELEASE)
 				{
 					input->mainCat->SetLeft_on(false);
+
+					if (input->network) {
+						char currentDir = -1;
+						if (input->mainCat->GetRight()) currentDir = RIGHT;
+						else if (input->mainCat->GetTop()) currentDir = UP;
+						else if (input->mainCat->GetBottom()) currentDir = DOWN;
+
+						std::vector<char> packet = PacketFactory::CSMovePacket(currentDir, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						cout << "[SEND] A key released!!" << endl;
+					}
 				}
 			}
 			break;
@@ -73,10 +110,27 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 				if (action == GLFW_PRESS)
 				{
 					input->mainCat->SetTop_on(true);
+
+					if (input->network) {
+						std::vector<char> packet = PacketFactory::CSMovePacket(UP, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						cout << "[SEND] W key pressed!!" << endl;
+					}
 				}
 				else if (action == GLFW_RELEASE)
 				{
 					input->mainCat->SetTop_on(false);
+
+					if (input->network) {
+						char currentDir = -1;
+						if (input->mainCat->GetRight()) currentDir = RIGHT;
+						else if (input->mainCat->GetBottom()) currentDir = DOWN;
+						else if (input->mainCat->GetLeft()) currentDir = LEFT;
+
+						std::vector<char> packet = PacketFactory::CSMovePacket(currentDir, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						std::cout << "[SEND] W key released" << std::endl;
+					}
 				}
 			}
 			break;
@@ -86,10 +140,27 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 				if (action == GLFW_PRESS)
 				{
 					input->mainCat->SetBottom_on(true);
+
+					if (input->network) {
+						std::vector<char> packet = PacketFactory::CSMovePacket(DOWN, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						cout << "[SEND] S key pressed!!" << endl;
+					}
 				}
 				else if (action == GLFW_RELEASE)
 				{
 					input->mainCat->SetBottom_on(false);
+
+					if (input->network) {
+						char currentDir = -1;
+						if (input->mainCat->GetRight()) currentDir = RIGHT;
+						else if (input->mainCat->GetTop()) currentDir = UP;
+						else if (input->mainCat->GetLeft()) currentDir = LEFT;
+
+						std::vector<char> packet = PacketFactory::CSMovePacket(currentDir, input->mainCat->Shift_value());
+						input->network->Send(packet);
+						std::cout << "[SEND] S key released" << std::endl;
+					}
 				}
 			}
 			break;
