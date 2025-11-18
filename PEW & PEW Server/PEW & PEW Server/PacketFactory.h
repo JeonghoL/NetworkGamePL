@@ -7,7 +7,8 @@
 struct PacketFactory {
 	static std::vector<char> SCLoginPacket();
 	static std::vector<char> SCMovePacket(GameObject* obj);
-
+	static std::vector<char> SCAddPacket(GameObject* obj);
+	static std::vector<char> SCRemovePacket(GameObject* obj);
 
 	template<typename Packet>
 	static std::vector<char> Serialize(const Packet& packet)

@@ -1,6 +1,8 @@
 #include "GameThread.h"
 #include "IODispatcher.h"
 #include "protocol.hpp"
+#include "PacketFactory.h"
+#include "Character.h"
 
 GameThread::GameThread() : m_running(false)
 {
@@ -72,19 +74,18 @@ void GameThread::ProcessPacket(std::pair<int, std::vector<char>>& packetInfo)
 
 void GameThread::LoginHandler(std::pair<int, std::vector<char>>& packetInfo)
 {
-	std::cout << "LoginHandler" << std::endl;
+	int sessId = packetInfo.first;
+	const std::vector<char>& packet = packetInfo.second;
+
+	auto login = PacketFactory::Deserialize<CS_LOGIN_PACKET>(packet);
+	
+	_objMng.CreatObject<Character>(sessId);
+	IODispatcher::Get().PushSendPacket(sessId, PacketFactory::SCLoginPacket());
+
+
 }
 
 void GameThread::MoveHandler(std::pair<int, std::vector<char>>& packetInfo)
 {
 	std::cout << "MoveHandler" << std::endl;
 }
-
-//void GameThread::TestHandler(std::pair<int, std::vector<char>>& packetInfo)
-//{
-//	// 패킷 핸들러에서 수행해야할 것
-//	//
-//	// 1. 직렬화된 패킷을 자신이 처리해야하는 구체 패킷 class로 casting
-//	// 2. PacketType에 맞는 처리
-//	std::cout << "TestHandler" << std::endl;
-//}

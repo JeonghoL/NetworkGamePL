@@ -59,13 +59,18 @@ struct vec3 {
 	}
 };
 
-enum ObjectType {
+enum class ObjectType {
 	Character,
 	Projectile
 };
 
 class GameObject {
 public:
+	GameObject(int i, ObjectType t) : id(i), type(t)
+	{
+		position = { 0.0f, 0.0f, 0.0f };
+		version = 0;
+	}
 	virtual ~GameObject() = default;
 
 	virtual void Update(const float dT) = 0;
@@ -74,6 +79,6 @@ public:
 	int id;
 	ObjectType type;
 	vec3 position;
-	size_t version{ 0 };
+	size_t version;
 };
 
