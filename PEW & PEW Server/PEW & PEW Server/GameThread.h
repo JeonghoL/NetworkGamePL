@@ -20,7 +20,7 @@ public:
 
 private:
 	void ThreadFunc();
-	void ProcessPacket(std::pair<int, std::vector<char>>& packetInfo);
+	void DispatchPackets();
 
 	void LoginHandler(std::pair<int, std::vector<char>>& packetInfo);
 	void MoveHandler(std::pair<int, std::vector<char>>& packetInfo);

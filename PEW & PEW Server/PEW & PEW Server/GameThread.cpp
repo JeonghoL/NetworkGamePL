@@ -4,6 +4,8 @@
 #include "PacketFactory.h"
 #include "Character.h"
 
+#include <iostream>
+
 GameThread::GameThread() : m_running(false)
 {
 	// TODO : 패킷 핸들러 등록
@@ -43,6 +45,8 @@ void GameThread::ThreadFunc()
 	auto prev = steady_clock::now();
 	while (m_running)
 	{
+		DispatchPackets();
+
 		auto now = steady_clock::now();
 		accumlator += duration<float>(now - prev).count();
 		prev = now;
@@ -55,21 +59,24 @@ void GameThread::ThreadFunc()
 			// 2. 충돌처리
 			// 3. etc...
 
-
 			accumlator -= TickTime;
 		}
 	}
 }
 
-void GameThread::ProcessPacket(std::pair<int, std::vector<char>>& packetInfo)
+void GameThread::DispatchPackets()
 {
-	const char type = packetInfo.second[1];
-	auto it = m_handlerTable.find(type);
-	if (it != m_handlerTable.end())
-		it->second(packetInfo);
+	auto& dispatcher = IODispatcher::Get();
 
-	else
-		std::cout << "Unknown Packet Type: " << type << std::endl;
+	std::pair<int, std::vector<char>> info;
+	while (dispatcher.recvQueue.try_pop(info))
+	{
+		char type = info.second[1];
+		auto it = m_handlerTable.find(type);
+
+		if (it != m_handlerTable.end())
+			it->second(info);
+	}
 }
 
 void GameThread::LoginHandler(std::pair<int, std::vector<char>>& packetInfo)
