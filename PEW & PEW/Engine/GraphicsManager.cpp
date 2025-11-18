@@ -7,6 +7,8 @@
 #include "Camera.h"
 #include "Enemy.h"
 #include "Timer.h"
+#include "NetworkManager.h"
+#include "RemotePlayer.h"
 
 void GraphicsManager::Init()
 {
@@ -41,6 +43,11 @@ void GraphicsManager::Update()
 			enemy[i][j]->Update(deltatime, mainCat->GetPosition(), enemy[i][j], mainCat);
 		}
 	}*/
+
+	if (network) {
+		for (auto& pair : network->GetRemotePlayers())
+			pair.second->Update(deltatime);
+	}
 }
 
 void GraphicsManager::Render(GLFWwindow* window)
@@ -78,6 +85,11 @@ void GraphicsManager::Render(GLFWwindow* window)
 		}
 	}*/
 
+	if (network) {
+		for (auto& pair : network->GetRemotePlayers())
+			pair.second->Draw(view, projection, viewPos, deltatime);
+	}
+
 	camera->Render();
 
 	glFinish();
@@ -104,6 +116,11 @@ void GraphicsManager::RenderShadow()
 			enemy[i][j]->DrawEnemyShadow(shadowMap);
 		}
 	}*/
+
+	if (network) {
+		for (auto& pair : network->GetRemotePlayers())
+			pair.second->DrawShadow(shadowMap->GetDepthShaderProgram(), shadowMap->GetLightSpaceMatrix());
+	}
 
 	GET_SINGLE(StaticObjectManager)->DrawShadow(lightSpaceMatrix, shadowMap->GetStaticDepthShaderProgram());
 
@@ -141,4 +158,9 @@ Camera* GraphicsManager::GetCamera() const
 MainCharacter* GraphicsManager::GetMainCat() const
 {
 	return mainCat;
+}
+
+void GraphicsManager::SetNetworkManager(NetworkManager* net)
+{
+	network = net;
 }

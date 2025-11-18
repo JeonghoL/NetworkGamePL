@@ -5,6 +5,9 @@ class PacketFactory
 public:
 	// Client -> Server
 	static vector<char> CSLoginPacket(int characterType);
+	static vector<char> CSMovePacket(float angle, char direction, bool run = false);
+	static vector<char> CSAttackPacket(glm::vec3 direction);
+	static vector<char> CSAttackEndPacket();
 
 public:
 	template<typename Packet>

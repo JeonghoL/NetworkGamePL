@@ -16,10 +16,12 @@ void Engine::Init()
 
 	graphics = new GraphicsManager();
 	graphics->Init();
+	graphics->SetNetworkManager(network);
 
 	input = new Input();
 	input->SetCamera(graphics->GetCamera());
 	input->SetMainCharacter(graphics->GetMainCat());
+	input->SetNetworkManager(network);
 
 	GLFWwindow* window = GET_SINGLE(WindowInfo)->GetWindow();
 	glfwSetWindowUserPointer(window, input);
@@ -34,9 +36,7 @@ void Engine::Update()
 
 	while (!glfwWindowShouldClose(window)) {
 		network->Update();
-
 		GET_SINGLE(Timer)->Update();
-
 		graphics->Update();
 		graphics->Render(window);
 		ShowFps();
