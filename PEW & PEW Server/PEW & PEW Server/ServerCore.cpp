@@ -33,7 +33,10 @@ void ServerCore::AcceptLoop()
 		if (SOCKET clientSocket = accept(m_listenSocket, nullptr, nullptr))
 		{
 			if (IOThread* ioThread = GetIdleIOThread())
-				ioThread->Start(clientSocket);
+			{
+				ioThread->Start(clientSocket, nextId);
+				nextId = (nextId + 1) % 3;
+			}
 
 			else
 				closesocket(clientSocket);

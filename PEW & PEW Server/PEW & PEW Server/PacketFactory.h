@@ -4,6 +4,8 @@
 #include <concepts>
 #include "protocol.hpp"
 
+class GameObject;
+
 struct PacketFactory {
 	static std::vector<char> SCLoginPacket();
 	static std::vector<char> SCMovePacket(GameObject* obj);

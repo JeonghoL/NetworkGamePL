@@ -21,7 +21,7 @@ std::vector<char> PacketFactory::SCMovePacket(GameObject* obj)
 	{
 		Character* character = static_cast<Character*>(obj);
 		move.size = sizeof(move);
-		move.type = SC_MOVE;
+		move.type = SC_MOVE_OBJECT;
 		move.id = obj->id;
 		move.angle = character->GetAngle();
 

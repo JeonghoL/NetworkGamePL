@@ -1,13 +1,11 @@
 #pragma once
 
-#include <iostream>
-
 enum PacketType : char {
 	CS_LOGIN,
 	CS_MOVE,
 
 	SC_LOGIN,
-	SC_MOVE,
+	SC_MOVE_OBJECT,
 	SC_ADD,
 	SC_REMOVE
 };

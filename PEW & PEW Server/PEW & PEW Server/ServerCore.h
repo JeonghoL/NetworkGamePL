@@ -29,5 +29,6 @@ private:
 	GameThread m_gameThread;
 
 	SOCKET m_listenSocket;
+	int nextId{ 0 };
 };
 

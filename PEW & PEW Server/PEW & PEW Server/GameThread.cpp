@@ -79,10 +79,18 @@ void GameThread::LoginHandler(std::pair<int, std::vector<char>>& packetInfo)
 
 	auto login = PacketFactory::Deserialize<CS_LOGIN_PACKET>(packet);
 	
-	_objMng.CreatObject<Character>(sessId);
-	IODispatcher::Get().PushSendPacket(sessId, PacketFactory::SCLoginPacket());
+	auto* character = _objMng.CreatObject<Character>(sessId);
 
+	auto& dispatcher = IODispatcher::Get();
+	dispatcher.sendQueues[sessId].push(PacketFactory::SCLoginPacket());
 
+	dispatcher.Broadcast(PacketFactory::SCAddPacket(character));
+
+	for (auto& [id, obj] : _objMng.GetObjects())
+	{
+		if (sessId == id) continue;
+		dispatcher.sendQueues[sessId].push(PacketFactory::SCAddPacket(obj.get()));
+	}
 }
 
 void GameThread::MoveHandler(std::pair<int, std::vector<char>>& packetInfo)

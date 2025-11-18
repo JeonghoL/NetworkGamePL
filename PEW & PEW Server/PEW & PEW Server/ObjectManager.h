@@ -4,7 +4,6 @@
 #include <unordered_map>
 
 #include "GameObject.h"
-#include "Character.h"
 
 template<typename T>
 concept ObjT = std::is_base_of_v<GameObject, T>;
@@ -16,7 +15,7 @@ public:
 	{
 		auto obj = std::make_unique<T>(std::forward<Args>(args)...);
 		T* ptr = obj.get();
-		_objects[obj->GetId()] = std::move(obj);
+		_objects[obj->id] = std::move(obj);
 		return ptr;
 	}
 

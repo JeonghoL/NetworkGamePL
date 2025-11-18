@@ -5,12 +5,13 @@
 #include <vector>
 
 IOThread::IOThread()
-	: m_clientSocket(INVALID_SOCKET), m_running(false)
+	: m_id(-1), m_clientSocket(INVALID_SOCKET), m_running(false)
 {
 }
 
-void IOThread::Start(SOCKET socket)
+void IOThread::Start(SOCKET socket, int id)
 {
+	m_id = id;
 	m_running = true;
 	m_thread = std::thread(&IOThread::Thread_Func, this);
 }

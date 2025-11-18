@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concurrent_queue.h>
+#include <array>
 #include <vector>
 
 using namespace concurrency;
@@ -13,13 +14,8 @@ public:
 		return instance;
 	}
 
-	void PushRecvPacket(size_t id, const std::vector<char>& packet);
-	void PushSendPacket(size_t id, const std::vector<char>& packet);
-	bool PopRecvPacket(std::pair<size_t, std::vector<char>>& out);
-	bool PopSendPacket(std::pair<size_t, std::vector<char>>& out);
+	void Broadcast(const std::vector<char>& packet);
 
-private:
-	concurrent_queue<std::pair<size_t, std::vector<char>>> m_recvQueue;
-	concurrent_queue<std::pair<size_t, std::vector<char>>> m_sendQueue;
+	concurrent_queue<std::pair<int, std::vector<char>>> recvQueue;
+	std::array<concurrent_queue<std::vector<char>>, 3> sendQueues;
 };
-
