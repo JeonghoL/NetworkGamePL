@@ -5,11 +5,12 @@
 #include "Timer.h"
 #include "Input.h"
 #include "GraphicsManager.h"
+#include "PacketFactory.h"
 
 void Engine::Init()
 {
 	network = new NetworkManager();
-	network->Init("127.0.0.1", PORT_NUM);		// 동환이가 주는 IP & 포트번호 넣어야함
+	network->Init("127.0.0.1", 9000);		// 동환이가 주는 IP & 포트번호 넣어야함
 
 	GET_SINGLE(WindowInfo)->Init();
 	GET_SINGLE(Timer)->Init();
@@ -18,10 +19,15 @@ void Engine::Init()
 	graphics->Init();
 	graphics->SetNetworkManager(network);
 
+	network->SetGraphicsManager(graphics);
+
+	vector<char> packet = PacketFactory::CSLoginPacket(1);
+	network->Send(packet);
+
 	input = new Input();
 	input->SetCamera(graphics->GetCamera());
-	input->SetMainCharacter(graphics->GetMainCat());
 	input->SetNetworkManager(network);
+	input->SetGraphicsManager(graphics);
 
 	GLFWwindow* window = GET_SINGLE(WindowInfo)->GetWindow();
 	glfwSetWindowUserPointer(window, input);
@@ -40,7 +46,7 @@ void Engine::Update()
 		graphics->Update();
 		graphics->Render(window);
 		ShowFps();
-		
+
 		// TODO
 
 		glfwSwapBuffers(window);
