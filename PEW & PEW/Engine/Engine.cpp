@@ -5,7 +5,6 @@
 #include "Timer.h"
 #include "Input.h"
 #include "GraphicsManager.h"
-#include "PacketFactory.h"
 
 void Engine::Init()
 {
@@ -21,9 +20,6 @@ void Engine::Init()
 
 	network->SetGraphicsManager(graphics);
 
-	vector<char> packet = PacketFactory::CSLoginPacket(1);
-	network->Send(packet);
-
 	input = new Input();
 	input->SetCamera(graphics->GetCamera());
 	input->SetNetworkManager(network);
@@ -33,7 +29,8 @@ void Engine::Init()
 	glfwSetWindowUserPointer(window, input);
 	glfwSetKeyCallback(window, Input::KeyBoardInput);
 	glfwSetScrollCallback(window, Input::Scroll_callback);
-	glfwSetMouseButtonCallback(window, Input::MouseFunc);
+	//glfwSetMouseButtonCallback(window, Input::MouseFunc);
+	glfwSetCursorPosCallback(window, Input::MouseMoveFunc);
 }
 
 void Engine::Update()
@@ -43,6 +40,7 @@ void Engine::Update()
 	while (!glfwWindowShouldClose(window)) {
 		network->Update();
 		GET_SINGLE(Timer)->Update();
+		input->Update(window);
 		graphics->Update();
 		graphics->Render(window);
 		ShowFps();

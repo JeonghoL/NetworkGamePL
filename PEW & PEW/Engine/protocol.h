@@ -3,13 +3,16 @@
 constexpr short PORT_NUM{ 9000 };
 
 enum PacketType : char {
-	CS_LOGIN,
 	CS_MOVE,
+	CS_ATTACK,
+	CS_ATTACK_END,
 
-	SC_LOGIN,
 	SC_MOVE_OBJECT,
 	SC_ADD,
-	SC_REMOVE
+	SC_REMOVE,
+	SC_ATTACK,
+	SC_ATTACK_END,
+	SC_STAT_UPDATE
 };
 
 enum MoveDirection : char {
@@ -25,12 +28,6 @@ enum MoveDirection : char {
 
 #pragma pack(push, 1)
 
-struct CS_LOGIN_PACKET {
-	unsigned char size;
-	char type;
-	int textureId;
-};
-
 struct CS_MOVE_PACKET {
 	unsigned char size;
 	char type;
@@ -39,7 +36,15 @@ struct CS_MOVE_PACKET {
 	bool isRun;
 };
 
-struct SC_LOGIN_PACKET {
+struct CS_ATTACK_PACKET {
+	unsigned char size;
+	char type;
+	float x;
+	float y;
+	float z;
+};
+
+struct CS_ATTACK_END_PACKET {
 	unsigned char size;
 	char type;
 };
@@ -60,6 +65,7 @@ struct SC_ADD_PACKET {
 	unsigned char size;
 	char type;
 	int id;
+	int ownerId;
 	float x;
 	float y;
 	float z;
@@ -69,6 +75,24 @@ struct SC_REMOVE_PACKET {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+struct SC_ATTACK_PACKET {
+	unsigned char size;
+	char type;
+	int id;
+};
+
+struct SC_ATTACK_END_PACKET {
+	unsigned char size;
+	char type;
+	int id;
+};
+
+struct SC_STAT_UPDATE_PACKET {
+	unsigned char size;
+	char type;
+	int hp;
 };
 
 #pragma pack(pop)

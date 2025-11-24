@@ -3,8 +3,8 @@
 // 각종 include
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include <winsock2.h>    // Windows 소켓 API - 이 헤더가 windows.h보다 앞에 존재해야함
+#include <ws2tcpip.h>	 // TCP / IP
 #include <Windows.h>
 #include <iostream>
 #include <fstream>
@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <array>
 #include "protocol.h"
 using namespace std;
 

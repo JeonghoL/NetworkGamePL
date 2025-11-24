@@ -57,6 +57,7 @@ public:
     float GetAngle() const { return angle; }
 
     void SetAngle();
+    void SetAngle(float ang);
     void SetStart(bool in) { start = in; }
 
 private:

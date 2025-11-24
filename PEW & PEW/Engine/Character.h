@@ -13,9 +13,14 @@ public:
 
     void Init();
     void Update(float deltaTime);
-    void Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 viewPos, float deltaTime, float angle = 0.0f);
-    void DrawShadow(float angle, GLuint depthShaderProgram, const glm::mat4& lightSpaceMatrix);
-    void DrawBulletShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader);
+    void Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 viewPos, float deltaTime, glm::mat4 lightSpaceMatrix, GLuint depthMap);
+    void DrawShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShaderProgram);
+
+    void CreateBulletFromServer(int bulletID, glm::vec3 startPos);
+    bool UpdateBulletFromServer(int bulletID, glm::vec3 newPos);
+    bool RemoveBulletFromServer(int bulletID);
+    void RenderBullets(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos, glm::mat4 lightSpaceMatrix, GLuint shadowMap);
+    void RenderBulletsShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader);
 
     // 입력 처리 (로컬 플레이어만)
     void SetRight_on(bool in) { if (isLocalPlayer) _Right = in; }
@@ -24,11 +29,12 @@ public:
     void SetBottom_on(bool in) { if (isLocalPlayer) _Bottom = in; }
     void Shift_on(bool in) { if (isLocalPlayer) _Shift = in; }
     void hitboxOnOff(bool in) { if (isLocalPlayer) hitbox_on = in; }
-    void SetFiring(bool in) { if (isLocalPlayer) firing = in; }
+    void SetFiring(bool in) { firing = in; }
     void SetCamera(Camera* cam) { if (isLocalPlayer) camera = cam; }
+    void SetAngle(float ang) { angle = ang; }
 
     // 네트워크 업데이트 (원격 플레이어만)
-    void UpdateFromPacket(float x, float y, float z, char direction = -1, bool run = false);
+    void UpdateFromPacket(float ang, float x, float y, float z, char direction = -1, bool move = false, bool run = false);
     void SetTargetPosition(float x, float y, float z);
 
     // Getter
@@ -46,10 +52,10 @@ public:
     bool GetTop() const { return _Top; }
     bool GetBottom() const { return _Bottom; }
     bool hitbox_ison() const { return hitbox_on; }
+    float GetAngle() const { return angle; }
 
     // MainCharacter 기존 함수들 (로컬 플레이어만)
     void ChangeCatAnimation(const glm::mat4& view, const glm::mat4& projection);
-    void ThrowBullets(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos, glm::mat4 lightSpaceMatrix, GLuint shadowMap);
     void SetAnimationType(const std::string& animName);
     AnimInfo* GetCurrentAnim() { return player_CurrentAnim; }
     AnimatedModel::AnimationLibrary* GetAnimLibrary() { return animLibrary; }
@@ -92,13 +98,25 @@ private:
     int life = 6;
     float revive_timer = 1200.0f;
     int hit_cnt = 200;
+    float angle;
     float lastangle;
 
-    // 전투 관련 (로컬 플레이어만)
     bool firing = false;
     bool firing_induration = false;
     bool Bullet_cnt[3] = { false, false, false };
-    vector<Bullet*> bullets;
+
+    static const int MAX_BULLETS = 15;  // 캐릭터당 최대 총알 수
+
+    struct BulletSlot {
+        Bullet* bullet;
+        int bulletID;           // 네트워크 동기화용 ID
+        bool isActive;
+
+        BulletSlot() : bulletID(-1), isActive(false) {}
+    };
+
+    array<BulletSlot, MAX_BULLETS> bullets;
+    int nextLocalBulletIndex = 0;
 
     // 로컬 플레이어 전용
     Camera* camera = nullptr;
@@ -106,10 +124,12 @@ private:
 
     // 원격 플레이어 전용
     char currentDirection = -1;
+    bool isMoving = false;
     bool isRunning = false;
 
     // 공통 함수들
     void SaveAnimations();
+    void CancelCatsFiring();
     void UpdateAnimation();
     void Walk();
     void Walk(float deltaTime);

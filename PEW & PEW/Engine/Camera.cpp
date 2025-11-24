@@ -318,3 +318,13 @@ void Camera::SetAngle()
         angle = GetHorizontalAngle();
     }
 }
+
+void Camera::SetAngle(float ang)
+{
+    if (!FirstPersonView) {
+        angle = ang;
+    }
+    else {
+        angle = GetHorizontalAngle();
+    }
+}

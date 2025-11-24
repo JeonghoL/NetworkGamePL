@@ -5,6 +5,7 @@
 #include "PacketFactory.h"
 #include "GraphicsManager.h"
 #include "Character.h"
+#include "WindowInfo.h"
 
 void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -19,9 +20,6 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 	if (!input->mainCat) {
 		return;
 	}
-
-	bool wasMoving = input->mainCat->IsMoving();
-	bool wasRunning = input->mainCat->Shift_value();
 
 	switch (key) {
 	case GLFW_KEY_P:
@@ -193,29 +191,6 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		//	}
 		//	break;
 	}
-
-	bool isMovingNow = input->mainCat->IsMoving();
-	bool isRunningNow = input->mainCat->Shift_value();
-
-	if (wasMoving != isMovingNow || (isMovingNow && wasRunning != isRunningNow)) {
-		if (!input->mainCat->GetFiringInduration())
-		{
-			if (isMovingNow) {
-				if (isRunningNow)
-				{
-					input->mainCat->GetAnimLibrary()->ChangeAnimation("Run", *input->mainCat->GetCurrentAnim());
-				}
-				else
-				{
-					input->mainCat->GetAnimLibrary()->ChangeAnimation("Walk", *input->mainCat->GetCurrentAnim());
-				}
-			}
-			else
-			{
-				input->mainCat->GetAnimLibrary()->ChangeAnimation("Idle", *input->mainCat->GetCurrentAnim());
-			}
-		}
-	}
 }
 
 void Input::Scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -247,23 +222,121 @@ void Input::MouseFunc(GLFWwindow* window, int button, int action, int mods)
 		{
 			if (action == GLFW_PRESS)
 			{
-				input->mainCat->SetFiring(true);
+				input->SendAttackPacket();
+				cout << "attack packet has send" << '\n';
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				input->mainCat->SetFiring(false);
+				input->SendAttackEndPacket();
+				cout << "attackend packet has send" << '\n';
 			}
 		}
 		break;
 	}
 
 	// 수정필요
-	if (input->mainCat->GetFiring() && input->mainCat->GetAnimLibrary()->GetCurrentAnimation() == "Run")
+	/*if (input->mainCat->GetFiring() && input->mainCat->GetAnimLibrary()->GetCurrentAnimation() == "Run")
 		input->mainCat->GetAnimLibrary()->ChangeAnimation("FireRun", *input->mainCat->GetCurrentAnim());
 	else if (input->mainCat->GetFiring() && input->mainCat->GetAnimLibrary()->GetCurrentAnimation() == "Walk")
 		input->mainCat->GetAnimLibrary()->ChangeAnimation("FireWalk", *input->mainCat->GetCurrentAnim());
 	else if (input->mainCat->GetFiring() && input->mainCat->GetAnimLibrary()->GetCurrentAnimation() == "Idle")
-		input->mainCat->GetAnimLibrary()->ChangeAnimation("Fire", *input->mainCat->GetCurrentAnim());
+		input->mainCat->GetAnimLibrary()->ChangeAnimation("Fire", *input->mainCat->GetCurrentAnim());*/
+}
+
+void Input::MouseMoveFunc(GLFWwindow* window, double xpos, double ypos)
+{
+	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
+
+	if (!input->mainCat) return;
+
+	if (input->camera->Get_start_pos() != 0 || input->mainCat->GetDying()) {
+		return;
+	}
+
+	cur_x = xpos;
+	cur_y = ypos;
+
+	// Camera 클래스의 기존 시스템 활용
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIN_W / (float)WIN_H, 0.1f, 1000.0f);
+	glm::mat4 view = input->camera->GetViewMatrix(input->mainCat->GetPosition());
+
+	// Camera의 SetMouseWorldDirection 사용
+	if (!input->camera->IsAltPressed())
+		mouseDir = input->camera->SetMouseWorldDirection(xpos, ypos, projection, view, input->mainCat->GetPosition());
+
+	// 3D 방향벡터를 2D 각도로 변환
+	float angleRad = (float)PI + atan2(mouseDir.x, mouseDir.z);
+
+	// 이전 각도와 비교해서 1도 이상 차이나면 갱신하고 패킷 전송
+	if (abs(angleRad - input->mainCat->GetAngle()) >= 0.1f) {
+		input->mainCat->SetAngle(angleRad);
+		input->lastMouseAngle = angleRad;
+		input->SendMovePacket();
+	}
+}
+
+void Input::Update(GLFWwindow* window)
+{
+	CheckContinuousAttack(window);
+}
+
+void Input::CheckContinuousAttack(GLFWwindow* window)
+{
+	if (!mainCat) return;
+
+	bool isMousePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+
+	if (isMousePressed && camera->Get_start_pos() == 0 && !mainCat->GetDying())
+	{
+		if (!isAttacking)
+		{
+			// 첫 공격 시작
+			isAttacking = true;
+			SendAttackPacket();
+			firstAttackSent = true;
+			cout << "first attack packet has send" << '\n';
+		}
+		else
+		{
+			// 연속 공격 체크 로직
+			std::string currentAnim = mainCat->GetAnimLibrary()->GetCurrentAnimation();
+			bool isFireAnim = (currentAnim == "Fire" || currentAnim == "FireWalk" || currentAnim == "FireRun");
+
+			if (isFireAnim)
+			{
+				AnimInfo* currentAnimInfo = mainCat->GetCurrentAnim();
+
+				if (currentAnimInfo->CurrentTime + 10.0f >= currentAnimInfo->Duration)
+				{
+					if (!wasFireAnimation)
+					{
+						SendAttackPacket();
+						wasFireAnimation = true;
+						cout << "continuous attack packet has send" << '\n';
+					}
+				}
+				else
+				{
+					wasFireAnimation = false;
+				}
+			}
+		}
+	}
+	else
+	{
+		// 마우스를 떼었을 때
+		if (isAttacking)
+		{
+			// attack end 패킷 전송
+			SendAttackEndPacket();
+			cout << "attack end packet has send" << '\n';
+
+			// 상태 초기화
+			isAttacking = false;
+			firstAttackSent = false;
+			wasFireAnimation = false;
+		}
+	}
 }
 
 char Input::GetCurrentDirection()
@@ -295,6 +368,40 @@ void Input::SendMovePacket()
 	char direction = GetCurrentDirection();
 	bool isRunning = mainCat->Shift_value();
 
-	vector<char> packet = PacketFactory::CSMovePacket(direction, isRunning);
+	vector<char> packet = PacketFactory::CSMovePacket(lastMouseAngle, direction, isRunning);
+	network->Send(packet);
+}
+
+void Input::SendAttackPacket()
+{
+	if (!network) return;
+
+	glm::vec3 position = mainCat->GetPosition();
+	position.y = 0.45f;
+
+	float angle = atan2(mouseDir.x, mouseDir.z);
+
+	position.x += cos(angle) * 0.2f;
+	position.z -= sin(angle) * 0.2f;
+
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIN_W / (float)WIN_H, 0.1f, 1000.0f);
+	glm::mat4 view = camera->GetViewMatrix(mainCat->GetPosition());
+
+	glm::vec3 mousePick = camera->GetMousePicking(cur_x, cur_y, projection, view);
+
+	glm::vec3 targetPos = mousePick;
+	targetPos.y = 0.45f;
+
+	glm::vec3 direction = glm::normalize(targetPos - position);
+
+	vector<char> packet = PacketFactory::CSAttackPacket(direction);
+	network->Send(packet);
+}
+
+void Input::SendAttackEndPacket()
+{
+	if (!network) return;
+
+	vector<char> packet = PacketFactory::CSAttackEndPacket();
 	network->Send(packet);
 }

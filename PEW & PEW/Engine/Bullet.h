@@ -27,6 +27,7 @@ public:
 	void BulletUpdate();
 
 	glm::vec3 GettPos() { return tPos; }
+	void SetPosition(glm::vec3 startPos);
 	void SetDirection(glm::vec3 startPos, glm::vec3 endPos) { direction = glm::normalize(endPos - startPos); }
 
 private:
@@ -37,7 +38,6 @@ private:
 	glm::mat4 model{ 1.0f };
 	Assimp::Importer objectImporter;
 	bool shoot{ false };
-	float angle{ 0.0f };
 	glm::vec3 direction{ 1.0f };
 	float bulletSpeed{ 0.2f };
 	int b_type{ 0 };
