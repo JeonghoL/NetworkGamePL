@@ -1,5 +1,5 @@
 #include "PacketFactory.h"
-#include "protocol.hpp"
+#include "protocol.h"
 #include "GameObject.h"
 #include "Character.h"
 

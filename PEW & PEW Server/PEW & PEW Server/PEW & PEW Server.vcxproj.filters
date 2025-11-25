@@ -50,7 +50,7 @@
       <Filter>Thread</Filter>
     </ClInclude>
     <ClInclude Include="IODispatcher.h" />
-    <ClInclude Include="protocol.hpp">
+    <ClInclude Include="protocol.h">
       <Filter>Protocol</Filter>
     </ClInclude>
     <ClInclude Include="PacketFactory.h">

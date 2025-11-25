@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <concepts>
-#include "protocol.hpp"
+#include "protocol.h"
 
 class GameObject;
 

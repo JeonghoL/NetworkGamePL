@@ -1,6 +1,6 @@
 #include "GameThread.h"
 #include "IODispatcher.h"
-#include "protocol.hpp"
+#include "protocol.h"
 #include "PacketFactory.h"
 #include "Character.h"
 

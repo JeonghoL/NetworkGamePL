@@ -34,68 +34,46 @@ void IOThread::Stop()
 
 void IOThread::Thread_Func()
 {
-    std::vector<char> recvBuffer;
-    recvBuffer.reserve(8192);
-
     auto& dispatcher = IODispatcher::Get();
-
-    constexpr int TEMP_BUFFER = 4096;
-    std::vector<char> temp(TEMP_BUFFER);
 
     while (m_running)
     {
-        // 1) blocking recv
-        int ret = recv(m_clientSocket, temp.data(), TEMP_BUFFER, 0);
+		unsigned char sizeByte{ 0 };
+		int ret = recv(m_clientSocket, reinterpret_cast<char*>(&sizeByte), 1, 0);
 
-        if (ret > 0)
-        {
-            // 받은 만큼 붙이기
-            recvBuffer.insert(recvBuffer.end(), temp.begin(), temp.begin() + ret);
+		if (ret == 0) break;
+		else if (ret < 0)
+		{
+			int err = WSAGetLastError();
+			if (err == WSAEINTR) continue;
+			else break;
+		}
 
-            // 2) 패킷 단위 추출
-            while (true)
-            {
-                if (recvBuffer.size() < 1)
-                    break; // 최소 size도 없음
+		unsigned char packetSize = sizeByte;
+		if (packetSize < 2) break;
 
-                unsigned char packetSize = recvBuffer[0];
+		std::vector<char> packet(packetSize);
+		packet[0] = sizeByte;
 
-                if (recvBuffer.size() < packetSize)
-                    break; // 아직 패킷이 다 안 들어옴
+		int toRead = packetSize - 1;
+		int offset = 1;
 
-                // 정상 패킷 하나 추출
-                std::vector<char> onePacket(
-                    recvBuffer.begin(),
-                    recvBuffer.begin() + packetSize
-                );
+		int r = recv(m_clientSocket, packet.data() + offset, toRead, MSG_WAITALL);
+		if (r <= 0) break;
+		else dispatcher.recvQueue.push(std::make_pair(m_id, packet));
 
-                dispatcher.recvQueue.push({ m_id, std::move(onePacket) });
+		std::vector<char> sendPkt;
+		while (dispatcher.sendQueues[m_id].try_pop(sendPkt))
+		{
+			int total = sendPkt.size();
+			int sent = 0;
 
-                // 버퍼에서 소비한 만큼 제거
-                recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + packetSize);
-            }
-        }
-        else if (ret == 0)
-        {
-            // 정상 종료
-            Stop();
-            break;
-        }
-        else
-        {
-            int err = WSAGetLastError();
-            if (err != WSAEWOULDBLOCK && err != WSAEINTR)
-            {
-                Stop();
-                break;
-            }
-        }
-
-        // 3) Send queue 처리 (non-blocking)
-        std::vector<char> pktToSend;
-        while (dispatcher.sendQueues[m_id].try_pop(pktToSend))
-        {
-            send(m_clientSocket, pktToSend.data(), (int)pktToSend.size(), 0);
-        }
+			while (sent < total)
+			{
+				int s = send(m_clientSocket, sendPkt.data() + sent, total - sent, 0);
+				if (s <= 0) break;
+				else sent += s;
+			}
+		}
     }
 }

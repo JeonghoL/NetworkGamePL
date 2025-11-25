@@ -134,7 +134,7 @@
     <ClInclude Include="IOThread.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="PacketFactory.h" />
-    <ClInclude Include="protocol.hpp" />
+    <ClInclude Include="protocol.h" />
     <ClInclude Include="ServerCore.h" />
   </ItemGroup>
   <ItemGroup>
