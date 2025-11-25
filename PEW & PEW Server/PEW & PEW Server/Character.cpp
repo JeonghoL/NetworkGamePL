@@ -1,12 +1,20 @@
 #include "Character.h"
 #include "protocol.h"
-#include "GameObject.h"
 
 #include <algorithm>
 
 Character::Character(int i)
-	: GameObject(i, ObjectType::Character), _direction(-1), _isRun(false), _angle(0.0f)
+	: _id(i)
 {
+	_pos = DEFAULT_POS[i % 2];
+	_angle = 0.0f;
+	_angleChange = false;
+
+	_hp = MAX_HP;
+	_isAlive = true;
+	_isDeadProcessed = false;
+
+	_version = 0;
 }
 
 void Character::Update(const float dT)
@@ -14,9 +22,9 @@ void Character::Update(const float dT)
 	Move(dT);
 }
 
-inline bool Character::IsAlive() const
+bool Character::IsAlive() const
 {
-	return false;
+	return _isAlive;
 }
 
 void Character::TakeDamage(int damage)
@@ -61,7 +69,7 @@ std::pair<vec3, vec3> Character::GetCollisionBox() const
 	const vec3 offsetMin{ SIZE_X / 2, 0, SIZE_Z / 2 };
 	const vec3 offsetMax{ SIZE_X / 2, SIZE_Y, SIZE_Z / 2 };
 
-	return { position - offsetMin, position + offsetMax };
+	return { _pos - offsetMin, _pos + offsetMax };
 }
 
 void Character::SetInput(float angle, char direction, bool isRun)
@@ -108,7 +116,7 @@ void Character::Death()
 
 void Character::Revive()
 {
-	position = DEFAULT_POS[id % 2];
+	_pos = DEFAULT_POS[_id % 2];
 	_angle = 0.0f;
 	_angleChange = false;
 
@@ -147,10 +155,10 @@ void Character::Move(const float dT)
 		}
 	}
 
-	position += moveVec * moveDistance;
-	position.x = std::clamp(position.x, -14.5f, 14.5f);
-	position.z = std::clamp(position.z, -14.6f, 14.4f);
+	_pos += moveVec * moveDistance;
+	_pos.x = std::clamp(_pos.x, -14.5f, 14.5f);
+	_pos.z = std::clamp(_pos.z, -14.6f, 14.4f);
 
-	version++;
+	_version++;
 }
 
