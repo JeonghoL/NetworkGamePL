@@ -54,7 +54,7 @@ void GameThread::ThreadFunc()
 		while (accumlator >= TickTime)
 		{
 			// 1. 상태 Update
-			_objMng.Update(TickTime);
+			//_objMng.Update(TickTime);
 
 			// 2. 충돌처리
 			// 3. etc...
@@ -86,7 +86,7 @@ void GameThread::LoginHandler(std::pair<int, std::vector<char>>& packetInfo)
 
 	auto login = PacketFactory::Deserialize<CS_LOGIN_PACKET>(packet);
 	
-	auto* character = _objMng.CreatObject<Character>(sessId);
+	/*auto* character = _objMng.CreatObject<Character>(sessId);
 
 	auto& dispatcher = IODispatcher::Get();
 	dispatcher.sendQueues[sessId].push(PacketFactory::SCLoginPacket());
@@ -97,10 +97,9 @@ void GameThread::LoginHandler(std::pair<int, std::vector<char>>& packetInfo)
 	{
 		if (sessId == id) continue;
 		dispatcher.sendQueues[sessId].push(PacketFactory::SCAddPacket(obj.get()));
-	}
+	}*/
 }
 
 void GameThread::MoveHandler(std::pair<int, std::vector<char>>& packetInfo)
 {
-	std::cout << "MoveHandler" << std::endl;
 }

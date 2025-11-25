@@ -4,13 +4,25 @@
 #include <concepts>
 #include "protocol.h"
 
-class GameObject;
+#include "Character.h"
+#include "Projectile.h"
 
 struct PacketFactory {
 	static std::vector<char> SCLoginPacket();
-	static std::vector<char> SCMovePacket(GameObject* obj);
-	static std::vector<char> SCAddPacket(GameObject* obj);
-	static std::vector<char> SCRemovePacket(GameObject* obj);
+	static std::vector<char> SCMovePacket(const Character& character);
+	static std::vector<char> SCMovePacket(const Projectile& projectile);
+	static std::vector<char> SCAddPacket(const Character& character);
+	static std::vector<char> SCAddPacket(const Projectile& projectile);
+	static std::vector<char> SCRemovePacket(const Character& character);
+	static std::vector<char> SCRemovePacket(const Projectile& projectile);
+	static std::vector<char> SCStatUpdatePacket(const Character& character);
+	static std::vector<char> SCAttackPacket(const Character& character);
+	static std::vector<char> SCAttackEndPacket(const Character& character);
+	static std::vector<char> SCDeadPacket(const Character& character);
+	static std::vector<char> SCRevivePacket(const Character& character);
+	static std::vector<char> SCGameStartPacket();
+	static std::vector<char> SCGameWinPacket();
+	static std::vector<char> SCGameLosePacket();
 
 	template<typename Packet>
 	static std::vector<char> Serialize(const Packet& packet)

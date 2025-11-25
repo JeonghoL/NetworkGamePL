@@ -5,7 +5,9 @@
 #include <functional>
 #include <unordered_map>
 
-#include "ObjectManager.h"
+#include "CharacterManager.h"
+#include "CollisionManager.h"
+#include "ProjectileManager.h"
 
 class GameThread {
 	using PacketHandler = std::function<void(std::pair<int, std::vector<char>>&)>;
@@ -24,8 +26,6 @@ private:
 
 	void LoginHandler(std::pair<int, std::vector<char>>& packetInfo);
 	void MoveHandler(std::pair<int, std::vector<char>>& packetInfo);
-
-	ObjectManager _objMng;
 
 	std::thread m_thread;
 	std::unordered_map<char, PacketHandler> m_handlerTable;

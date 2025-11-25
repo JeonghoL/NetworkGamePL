@@ -128,24 +128,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Character.h" />
-    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="CharacterManager.h" />
+    <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="GameThread.h" />
     <ClInclude Include="IODispatcher.h" />
     <ClInclude Include="IOThread.h" />
-    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="PacketFactory.h" />
+    <ClInclude Include="Projectile.h" />
+    <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="ServerCore.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Character.cpp" />
-    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="CharacterManager.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="GameThread.cpp" />
     <ClCompile Include="IODispatcher.cpp" />
     <ClCompile Include="IOThread.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="PacketFactory.cpp" />
+    <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="ServerCore.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

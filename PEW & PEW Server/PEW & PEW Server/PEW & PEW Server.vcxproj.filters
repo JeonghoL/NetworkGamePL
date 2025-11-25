@@ -13,6 +13,9 @@
     <Filter Include="Game">
       <UniqueIdentifier>{2841e129-bc01-4d43-8dc9-4ee30d4fb461}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Manager">
+      <UniqueIdentifier>{1bb3e2c4-fa97-409a-8ef4-5c9cde5866f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServerCore.cpp">
@@ -29,14 +32,20 @@
     <ClCompile Include="PacketFactory.cpp">
       <Filter>Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="Character.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterManager.cpp">
+      <Filter>Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager.cpp">
+      <Filter>Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectileManager.cpp">
+      <Filter>Game\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,14 +65,20 @@
     <ClInclude Include="PacketFactory.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectManager.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="Character.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterManager.h">
+      <Filter>Game\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>Game\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileManager.h">
+      <Filter>Game\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

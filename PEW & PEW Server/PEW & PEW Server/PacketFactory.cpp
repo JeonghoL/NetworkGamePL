@@ -1,7 +1,4 @@
 #include "PacketFactory.h"
-#include "protocol.h"
-#include "GameObject.h"
-#include "Character.h"
 
 std::vector<char> PacketFactory::SCLoginPacket()
 {
@@ -12,90 +9,180 @@ std::vector<char> PacketFactory::SCLoginPacket()
 	return Serialize(login);
 }
 
-std::vector<char> PacketFactory::SCMovePacket(GameObject* obj)
+std::vector<char> PacketFactory::SCMovePacket(const Character& character)
 {
 	SC_MOVE_PACKET move;
+	move.size = sizeof(move);
+	move.type = SC_MOVE_OBJECT;
+	move.id = character.GetId();
+	move.angle = character.GetAngle();
 
-	switch (obj->type) {
-	case ObjectType::Character:
-	{
-		Character* character = static_cast<Character*>(obj);
-		move.size = sizeof(move);
-		move.type = SC_MOVE_OBJECT;
-		move.id = obj->id;
-		move.angle = character->GetAngle();
+	vec3 charPos = character.GetPosition();
 
-		vec3 charPos = character->position;
+	move.x = charPos.x;
+	move.y = charPos.y;
+	move.z = charPos.z;
 
-		move.x = charPos.x;
-		move.y = charPos.y;
-		move.z = charPos.z;
-
-		move.isMove = character->IsMove();
-		move.isRun = character->IsRun();
-
-		break;
-	}
-	case ObjectType::Projectile:
-	{
-		// TODO : Projectile 이동
-		break;
-	}
-	}
+	move.isMove = character.IsMove();
+	move.isRun = character.IsRun();
 
 	return Serialize(move);
 }
 
-std::vector<char> PacketFactory::SCAddPacket(GameObject* obj)
+std::vector<char> PacketFactory::SCMovePacket(const Projectile& projectile)
+{
+	SC_MOVE_PACKET move;
+	move.size = sizeof(move);
+	move.type = SC_MOVE_OBJECT;
+	move.id = projectile.GetId();
+	move.angle = 0.0f;
+
+	vec3 charPos = projectile.GetPosition();
+
+	move.x = charPos.x;
+	move.y = charPos.y;
+	move.z = charPos.z;
+
+	move.isRun = false;
+
+	return Serialize(move);
+}
+
+std::vector<char> PacketFactory::SCAddPacket(const Character& character)
 {
 	SC_ADD_PACKET add;
+	add.size = sizeof(add);
+	add.type = SC_ADD;
+	add.id = character.GetId();
+	add.ownerId = 0;
 
-	switch (obj->type) {
-	case ObjectType::Character:
-	{
-		Character* character = static_cast<Character*>(obj);
-		add.size = sizeof(add);
-		add.type = SC_ADD;
-		add.id = character->id;
+	vec3 charPos = character.GetPosition();
 
-		vec3 charPos = character->position;
+	add.x = charPos.x;
+	add.y = charPos.y;
+	add.z = charPos.z;
 
-		add.x = charPos.x;
-		add.y = charPos.y;
-		add.z = charPos.z;
-
-		break;
-	}
-	case ObjectType::Projectile:
-	{
-		// TODO : Projectile 추가
-		break;
-	}
-	}
+	add.textureId = character.GetTexture();
 
 	return Serialize(add);
 }
 
-std::vector<char> PacketFactory::SCRemovePacket(GameObject* obj)
+std::vector<char> PacketFactory::SCAddPacket(const Projectile& projectile)
+{
+	SC_ADD_PACKET add;
+	add.size = sizeof(add);
+	add.type = SC_ADD;
+	add.id = projectile.GetId();
+	add.ownerId = projectile.GetOwnerId();
+
+	vec3 projPos = projectile.GetPosition();
+
+	add.x = projPos.x;
+	add.y = projPos.y;
+	add.z = projPos.z;
+
+	return Serialize(add);
+}
+
+std::vector<char> PacketFactory::SCRemovePacket(const Character& character)
 {
 	SC_REMOVE_PACKET remove;
-
-	switch (obj->type) {
-	case ObjectType::Character:
-	{
-		Character* character = static_cast<Character*>(obj);
-		remove.size = sizeof(remove);
-		remove.type = SC_REMOVE;
-		remove.id = character->id;
-
-		break;
-	}
-	case ObjectType::Projectile:
-	{
-		// TODO : Projectile 삭제
-		break;
-	}
-	}
+	remove.size = sizeof(remove);
+	remove.type = SC_REMOVE;
+	remove.id = character.GetId();
 
 	return Serialize(remove);
+}
+
+std::vector<char> PacketFactory::SCRemovePacket(const Projectile& projectile)
+{
+	SC_REMOVE_PACKET remove;
+	remove.size = sizeof(remove);
+	remove.type = SC_REMOVE;
+	remove.id = projectile.GetId();
+
+	return Serialize(remove);
+}
+
+std::vector<char> PacketFactory::SCStatUpdatePacket(const Character& character)
+{
+	SC_STAT_UPDATE_PACKET stat;
+	stat.size = sizeof(stat);
+	stat.type = SC_STAT_UPDATE;
+	stat.id = character.GetId();
+
+	return Serialize(stat);
+}
+
+std::vector<char> PacketFactory::SCAttackPacket(const Character& character)
+{
+	SC_ATTACK_PACKET attack;
+	attack.size = sizeof(attack);
+	attack.type = SC_ATTACK;
+	attack.id = character.GetId();
+
+	return Serialize(attack);
+}
+
+std::vector<char> PacketFactory::SCAttackEndPacket(const Character& character)
+{
+	SC_ATTACK_END_PACKET end;
+	end.size = sizeof(end);
+	end.type = SC_ATTACK_END;
+	end.id = character.GetId();
+
+	return Serialize(end);
+}
+
+std::vector<char> PacketFactory::SCDeadPacket(const Character& character)
+{
+	SC_DEAD_PACKET dead;
+	dead.size = sizeof(dead);
+	dead.type = SC_DEAD;
+	dead.id = character.GetId();
+
+	return Serialize(dead);
+}
+
+std::vector<char> PacketFactory::SCRevivePacket(const Character& character)
+{
+	SC_REVIVE_PACKET revive;
+	revive.size = sizeof(revive);
+	revive.type = SC_REVIVE;
+	revive.id = character.GetId();
+
+	vec3 charPos = character.GetPosition();
+
+	revive.x = charPos.x;
+	revive.y = charPos.y;
+	revive.z = charPos.z;
+
+	return Serialize(revive);
+}
+
+std::vector<char> PacketFactory::SCGameStartPacket()
+{
+	SC_GAME_START_PACKET start;
+	start.size = sizeof(start);
+	start.type = SC_GAME_START;
+
+	return Serialize(start);
+}
+
+std::vector<char> PacketFactory::SCGameWinPacket()
+{
+	SC_GAME_WIN_PACKET win;
+	win.size = sizeof(win);
+	win.type = SC_GAME_WIN;
+
+	return Serialize(win);
+}
+
+std::vector<char> PacketFactory::SCGameLosePacket()
+{
+	SC_GAME_LOSE_PACKET lose;
+	lose.size = sizeof(lose);
+	lose.type = SC_GAME_LOSE;
+
+	return Serialize(lose);
 }
