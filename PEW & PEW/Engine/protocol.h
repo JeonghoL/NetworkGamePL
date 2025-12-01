@@ -12,6 +12,8 @@ enum PacketType : char {
 	SC_REMOVE,
 	SC_ATTACK,
 	SC_ATTACK_END,
+	SC_DEAD,
+	SC_REVIVE,
 	SC_STAT_UPDATE
 };
 
@@ -89,10 +91,25 @@ struct SC_ATTACK_END_PACKET {
 	int id;
 };
 
+struct SC_DEAD_PACKET {
+	unsigned char size;
+	char type;
+	int id;
+};
+
+struct SC_REVIVE_PACKET {
+	unsigned char size;
+	char type;
+	int id;
+	float x;
+	float y;
+	float z;
+};
+
 struct SC_STAT_UPDATE_PACKET {
 	unsigned char size;
 	char type;
-	int hp;
+	int id;
 };
 
 #pragma pack(pop)

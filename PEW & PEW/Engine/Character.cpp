@@ -14,16 +14,17 @@ Character::Character(int id, bool isLocal) : playerID(id), isLocalPlayer(isLocal
 
     if (isLocalPlayer)
         hitbox = new BoundingBox();
-    else
-        hitbox = nullptr;
 
     characterPos = glm::vec3(-37.3051f, 0.0f, 42.5001f);
     targetPos = characterPos;
+
+    for (int i = 0; i < MAX_BULLETS; ++i)
+        bullets[i].bullet = new Bullet(1, 0, 0);
 }
 
 Character::~Character()
 {
-    if (isLocalPlayer && hitbox) {
+    if (isLocalPlayer) {
         delete hitbox;
     }
     delete player_CurrentAnim;
@@ -40,6 +41,12 @@ Character::~Character()
     glDeleteBuffers(1, &EBO);
     glDeleteTextures(1, &Texture);
     glDeleteProgram(shaderprogram);
+
+    for (int i = 0; i < MAX_BULLETS; ++i)
+    {
+        delete bullets[i].bullet;
+        bullets[i].bullet = nullptr;
+    }
 }
 
 void Character::Init()
@@ -53,20 +60,20 @@ void Character::Init()
 
 void Character::Update(float deltaTime)
 {
-    /*if (isLocalPlayer) {
-        HandleLocalPlayerUpdate(deltaTime);
-    }
-    else {*/
-    HandleRemotePlayerUpdate(deltaTime);
-    /*}*/
+    UpdateAllPlayersMovement(deltaTime);
 
     UpdateAnimation();
+    UpdateHitDecision();
+    UpdateBullets(deltaTime);
 }
 
 void Character::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 viewPos, float deltaTime, glm::mat4 lightSpaceMatrix, GLuint depthMap)
 {
+    if (dead)
+        return;
+
     // 로컬 플레이어만 히트박스 렌더링
-    if (isLocalPlayer && hitbox_ison())
+    if (isLocalPlayer && GetHitBox())
         hitbox->RenderHitbox(angle, characterPos, view, projection);
 
     animModel->UpdateAnimation(0, *player_BoneInfo, deltaTime, *player_CurrentAnim);
@@ -116,12 +123,12 @@ void Character::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 viewPos, fl
 
 void Character::DrawShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShaderProgram)
 {
+    if (dead)
+        return;
+
     model = glm::mat4(1.0f);
     model = glm::translate(model, characterPos);
-    if (!dying)
-        model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-    else
-        model = glm::rotate(model, lastangle, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 
     glUseProgram(depthShaderProgram);			// Depth map 렌더링
     GLuint lightSpaceMatrixLoc = glGetUniformLocation(depthShaderProgram, "lightSpaceMatrix");
@@ -133,56 +140,6 @@ void Character::DrawShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
 }
-
-void Character::CreateBulletFromServer(int bulletID, glm::vec3 startPos)
-{
-    // 빈 슬롯 찾기
-    for (int i = 0; i < MAX_BULLETS; ++i) {
-        if (!bullets[i].isActive) {
-            bullets[i].bullet = new Bullet(1, 0, 0);
-            bullets[i].bulletID = bulletID;
-            bullets[i].isActive = true;
-
-            // 서버에서 받은 위치와 방향으로 설정
-            bullets[i].bullet->SetPosition(startPos);
-
-            std::cout << "[CREATE BULLET FROM SERVER] Player: " << playerID
-                << ", Bullet ID: " << bulletID << ", Slot: " << i << std::endl;
-            return;
-        }
-    }
-}
-
-bool Character::RemoveBulletFromServer(int bulletID)
-{
-    for (int i = 0; i < MAX_BULLETS; ++i) {
-        if (bullets[i].isActive && bullets[i].bulletID == bulletID) {
-            delete bullets[i].bullet;
-            bullets[i].bullet = nullptr;
-            bullets[i].bulletID = -1;
-            bullets[i].isActive = false;
-
-            std::cout << "[REMOVE BULLET FROM SERVER] Player: " << playerID
-                << ", Bullet ID: " << bulletID << ", Slot: " << i << std::endl;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool Character::UpdateBulletFromServer(int bulletID, glm::vec3 newPos)
-{
-    for (int i = 0; i < MAX_BULLETS; ++i) {
-        if (bullets[i].isActive && bullets[i].bulletID == bulletID) {
-            bullets[i].bullet->SetPosition(newPos);
-            return true;
-        }
-    }
-
-    return false;
-}
-
 
 void Character::RenderBullets(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos, glm::mat4 lightSpaceMatrix, GLuint shadowMap)
 {
@@ -204,20 +161,64 @@ void Character::RenderBulletsShadow(const glm::mat4& lightSpaceMatrix, GLuint de
     }
 }
 
-void Character::HandleLocalPlayerUpdate(float deltaTime)
+void Character::CreateBulletFromServer(int bulletID, glm::vec3 startPos)
 {
-    // MainCharacter의 기존 Update 로직
-    if (IsMoving()) {
-        if (Shift_value())
-            Run(deltaTime);
-        else
-            Walk(deltaTime);
+    // 빈 슬롯 찾기
+    for (int i = 0; i < MAX_BULLETS; ++i) {
+        if (!bullets[i].isActive) {
+            bullets[i].bulletID = bulletID;
+            bullets[i].isActive = true;
+
+            // 서버에서 받은 위치와 방향으로 설정
+            bullets[i].bullet->SetPosition(startPos);
+
+            /*std::cout << "[CREATE BULLET FROM SERVER] Player: " << playerID
+                << ", Bullet ID: " << bulletID << ", Slot: " << i << std::endl;*/
+            return;
+        }
     }
 }
 
-void Character::HandleRemotePlayerUpdate(float deltaTime)
+bool Character::RemoveBulletFromServer(int bulletID)
 {
-    // RemotePlayer의 기존 Update 로직 (부드러운 보간)
+    for (int i = 0; i < MAX_BULLETS; ++i) {
+        if (bullets[i].isActive && bullets[i].bulletID == bulletID) {
+            bullets[i].bulletID = -1;
+            bullets[i].isActive = false;
+
+            /*std::cout << "[REMOVE BULLET FROM SERVER] Player: " << playerID
+                << ", Bullet ID: " << bulletID << ", Slot: " << i << std::endl;*/
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Character::UpdateBullets(float deltaTime)
+{
+    for (int i = 0; i < MAX_BULLETS; ++i)
+    {
+        if (bullets[i].isActive && bullets[i].bullet) {
+            bullets[i].bullet->BulletUpdate(deltaTime);
+        }
+    }
+}
+
+bool Character::UpdateBulletFromServer(int bulletID, glm::vec3 newPos)
+{
+    for (int i = 0; i < MAX_BULLETS; ++i) {
+        if (bullets[i].isActive && bullets[i].bulletID == bulletID) {
+            bullets[i].bullet->SetPosition(newPos);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Character::UpdateAllPlayersMovement(float deltaTime)
+{
     glm::vec3 direction = targetPos - characterPos;
     float distance = glm::length(direction);
 
@@ -226,149 +227,14 @@ void Character::HandleRemotePlayerUpdate(float deltaTime)
     }
 }
 
-void Character::Walk()
+void Character::UpdateHitDecision()
 {
-    if (!isLocalPlayer) return;  // 로컬 플레이어만
-
-    if (!camera->GetViewType()) {
-        if (_Right)
-            characterPos.x += 0.005f;
-        if (_Left)
-            characterPos.x -= 0.005f;
-        if (_Top)
-            characterPos.z -= 0.005f;
-        if (_Bottom)
-            characterPos.z += 0.005f;
-    }
-    else {
-        glm::vec3 forward(
-            sin(camera->GetHorizontalAngle()),
-            0,
-            cos(camera->GetHorizontalAngle())
-        );
-        glm::vec3 right = glm::cross(forward, glm::vec3(0, 1, 0));
-
-        glm::vec3 moveDir(0.0f);
-        if (_Top) moveDir += forward;
-        if (_Bottom) moveDir -= forward;
-        if (_Right) moveDir += right;
-        if (_Left) moveDir -= right;
-
-        if (glm::length(moveDir) > 0) {
-            moveDir = glm::normalize(moveDir);
-            glm::vec3 nextPos = characterPos + moveDir * 0.005f;
-            characterPos = nextPos;
-        }
-    }
-}
-
-void Character::Walk(float deltaTime)
-{
-    if (!isLocalPlayer) return;  // 로컬 플레이어만
-
-    constexpr float WALK_SPEED{ 1.5f };
-
-    if (!camera->GetViewType()) {
-        if (_Right)
-            characterPos.x += WALK_SPEED * deltaTime;
-        if (_Left)
-            characterPos.x -= WALK_SPEED * deltaTime;
-        if (_Top)
-            characterPos.z -= WALK_SPEED * deltaTime;
-        if (_Bottom)
-            characterPos.z += WALK_SPEED * deltaTime;
-    }
-    else {
-        glm::vec3 forward(
-            sin(camera->GetHorizontalAngle()),
-            0,
-            cos(camera->GetHorizontalAngle())
-        );
-        glm::vec3 right = glm::cross(forward, glm::vec3(0, 1, 0));
-
-        glm::vec3 moveDir(0.0f);
-        if (_Top) moveDir += forward;
-        if (_Bottom) moveDir -= forward;
-        if (_Right) moveDir += right;
-        if (_Left) moveDir -= right;
-
-        if (glm::length(moveDir) > 0) {
-            moveDir = glm::normalize(moveDir);
-            characterPos += moveDir * (WALK_SPEED * deltaTime);
-        }
-    }
-}
-
-void Character::Run()
-{
-    if (!isLocalPlayer) return;  // 로컬 플레이어만
-
-    if (!camera->GetViewType()) {
-        if (_Right)
-            characterPos.x += 0.012f;
-        if (_Left)
-            characterPos.x -= 0.012f;
-        if (_Top)
-            characterPos.z -= 0.012f;
-        if (_Bottom)
-            characterPos.z += 0.012f;
-    }
-    else {
-        glm::vec3 forward(
-            sin(camera->GetHorizontalAngle()),
-            0,
-            cos(camera->GetHorizontalAngle())
-        );
-        glm::vec3 right = glm::cross(forward, glm::vec3(0, 1, 0));
-
-        glm::vec3 moveDir(0.0f);
-        if (_Top) moveDir += forward;
-        if (_Bottom) moveDir -= forward;
-        if (_Right) moveDir += right;
-        if (_Left) moveDir -= right;
-
-        if (glm::length(moveDir) > 0) {
-            moveDir = glm::normalize(moveDir);
-            glm::vec3 nextPos = characterPos + moveDir * 0.01f;
-            characterPos = nextPos;
-        }
-    }
-}
-
-void Character::Run(float deltaTime)
-{
-    if (!isLocalPlayer) return;  // 로컬 플레이어만
-
-    constexpr float RUN_SPEED{ 3.0f };
-
-    if (!camera->GetViewType()) {
-        if (_Right)
-            characterPos.x += RUN_SPEED * deltaTime;
-        if (_Left)
-            characterPos.x -= RUN_SPEED * deltaTime;
-        if (_Top)
-            characterPos.z -= RUN_SPEED * deltaTime;
-        if (_Bottom)
-            characterPos.z += RUN_SPEED * deltaTime;
-    }
-    else {
-        glm::vec3 forward(
-            sin(camera->GetHorizontalAngle()),
-            0,
-            cos(camera->GetHorizontalAngle())
-        );
-        glm::vec3 right = glm::cross(forward, glm::vec3(0, 1, 0));
-
-        glm::vec3 moveDir(0.0f);
-        if (_Top) moveDir += forward;
-        if (_Bottom) moveDir -= forward;
-        if (_Right) moveDir += right;
-        if (_Left) moveDir -= right;
-
-        if (glm::length(moveDir) > 0) {
-            moveDir = glm::normalize(moveDir);
-            characterPos += moveDir * (RUN_SPEED * deltaTime);
-        }
+    if (hit_cnt > 0)
+        hit_cnt--;
+    else
+    {
+        if (hitcolor != glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
+            hitcolor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
 
@@ -390,19 +256,21 @@ void Character::SaveAnimations()
     animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
 }
 
-void Character::CancelCatsFiring()
-{
-    if (firing && !IsLocalPlayer())
-    {
-        AnimInfo* currentAnimInfo = GetCurrentAnim();
-
-        if (currentAnimInfo->CurrentTime + 15.0f >= currentAnimInfo->Duration)
-            firing = false;
-    }
-}
-
 void Character::UpdateAnimation()
 {
+    if (dying)
+    {
+        if (animLibrary->GetCurrentAnimation() != "Die")
+            animLibrary->ChangeAnimation("Die", *player_CurrentAnim);
+        else
+        {
+            if (player_CurrentAnim->CurrentTime + 10 >= player_CurrentAnim->Duration)
+                SetDead(true);
+        }
+
+        return;
+    }
+
     glm::vec3 velocity = targetPos - characterPos;
     float speed = glm::length(velocity);
 
@@ -460,164 +328,99 @@ void Character::UpdateAnimation()
             }
         }
     }
-}
 
-void Character::ChangeCatAnimation(const glm::mat4& view, const glm::mat4& projection)
-{
-    if (!GetDying())
+    if (animLibrary->GetCurrentAnimation() == "FireRun")
     {
-        if (animLibrary->GetCurrentAnimation() == "FireRun")
+        if (player_CurrentAnim->CurrentTime + 10.0f >= player_CurrentAnim->Duration)
         {
-            firing_induration = true;
-
-            if (player_CurrentAnim->CurrentTime + 10.0f >= player_CurrentAnim->Duration)
+            if (!firing)
             {
-                if (!firing)
+                if (isMoving)
                 {
-                    if (isMoving)
-                    {
-                        if (isRunning)
-                            animLibrary->ChangeAnimation("Run", *player_CurrentAnim);
-                        else
-                            animLibrary->ChangeAnimation("Walk", *player_CurrentAnim);
-                    }
+                    if (isRunning)
+                        animLibrary->ChangeAnimation("Run", *player_CurrentAnim);
                     else
-                        animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
-                    firing_induration = false;
+                        animLibrary->ChangeAnimation("Walk", *player_CurrentAnim);
                 }
                 else
-                {
-                    if (isMoving)
-                    {
-                        if (!isRunning)
-                            animLibrary->ChangeAnimation("FireWalk", *player_CurrentAnim);
-                        else
-                            animLibrary->ChangeAnimation("FireRun", *player_CurrentAnim);
-                    }
-                    else
-                        animLibrary->ChangeAnimation("Fire", *player_CurrentAnim);
-                }
-
-                for (bool& bullet_nums : Bullet_cnt)
-                    bullet_nums = false;
+                    animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
             }
-        }
-        else if (animLibrary->GetCurrentAnimation() == "FireWalk")
-        {
-            firing_induration = true;
-
-            if (player_CurrentAnim->CurrentTime + 10.0f >= player_CurrentAnim->Duration)
+            else
             {
-                if (!firing)
+                if (isMoving)
                 {
-                    if (isMoving)
-                    {
-                        if (isRunning)
-                            animLibrary->ChangeAnimation("Run", *player_CurrentAnim);
-                        else
-                            animLibrary->ChangeAnimation("Walk", *player_CurrentAnim);
-                    }
+                    if (!isRunning)
+                        animLibrary->ChangeAnimation("FireWalk", *player_CurrentAnim);
                     else
-                        animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
-                    firing_induration = false;
+                        animLibrary->ChangeAnimation("FireRun", *player_CurrentAnim);
                 }
                 else
-                {
-                    if (isMoving)
-                    {
-                        if (isRunning)
-                            animLibrary->ChangeAnimation("FireRun", *player_CurrentAnim);
-                        else
-                            animLibrary->ChangeAnimation("FireWalk", *player_CurrentAnim);
-                    }
-                    else
-                        animLibrary->ChangeAnimation("Fire", *player_CurrentAnim);
-                }
-
-                for (bool& bullet_nums : Bullet_cnt)
-                    bullet_nums = false;
+                    animLibrary->ChangeAnimation("Fire", *player_CurrentAnim);
             }
         }
-        else if (animLibrary->GetCurrentAnimation() == "Fire")
+    }
+    else if (animLibrary->GetCurrentAnimation() == "FireWalk")
+    {
+        if (player_CurrentAnim->CurrentTime + 10.0f >= player_CurrentAnim->Duration)
         {
-            firing_induration = true;
-
-            if (player_CurrentAnim->CurrentTime + 10.0f >= player_CurrentAnim->Duration)
+            if (!firing)
             {
-                if (!firing)
+                if (isMoving)
                 {
-                    if (isMoving)
-                    {
-                        if (isRunning)
-                            animLibrary->ChangeAnimation("Run", *player_CurrentAnim);
-                        else
-                            animLibrary->ChangeAnimation("Walk", *player_CurrentAnim);
-                    }
+                    if (isRunning)
+                        animLibrary->ChangeAnimation("Run", *player_CurrentAnim);
                     else
-                        animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
-                    firing_induration = false;
+                        animLibrary->ChangeAnimation("Walk", *player_CurrentAnim);
                 }
                 else
+                    animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
+            }
+            else
+            {
+                if (isMoving)
                 {
-                    if (isMoving)
-                    {
-                        if (isRunning)
-                            animLibrary->ChangeAnimation("FireRun", *player_CurrentAnim);
-                        else
-                            animLibrary->ChangeAnimation("FireWalk", *player_CurrentAnim);
-                    }
+                    if (isRunning)
+                        animLibrary->ChangeAnimation("FireRun", *player_CurrentAnim);
                     else
-                        animLibrary->ChangeAnimation("Fire", *player_CurrentAnim);
+                        animLibrary->ChangeAnimation("FireWalk", *player_CurrentAnim);
                 }
-
-                for (auto& bullet_nums : Bullet_cnt)
-                    bullet_nums = false;
+                else
+                    animLibrary->ChangeAnimation("Fire", *player_CurrentAnim);
             }
         }
-        else if (animLibrary->GetCurrentAnimation() == "Die")
-            animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
     }
-    else
+    else if (animLibrary->GetCurrentAnimation() == "Fire")
     {
-        if (animLibrary->GetCurrentAnimation() != "Die")
-            animLibrary->ChangeAnimation("Die", *player_CurrentAnim);
-        else
+        if (player_CurrentAnim->CurrentTime + 10.0f >= player_CurrentAnim->Duration)
         {
-            if (player_CurrentAnim->CurrentTime + 10 >= player_CurrentAnim->Duration)
-                SetDead(true);
+            if (!firing)
+            {
+                if (isMoving)
+                {
+                    if (isRunning)
+                        animLibrary->ChangeAnimation("Run", *player_CurrentAnim);
+                    else
+                        animLibrary->ChangeAnimation("Walk", *player_CurrentAnim);
+                }
+                else
+                    animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
+            }
+            else
+            {
+                if (isMoving)
+                {
+                    if (isRunning)
+                        animLibrary->ChangeAnimation("FireRun", *player_CurrentAnim);
+                    else
+                        animLibrary->ChangeAnimation("FireWalk", *player_CurrentAnim);
+                }
+                else
+                    animLibrary->ChangeAnimation("Fire", *player_CurrentAnim);
+            }
         }
     }
-}
-
-void Character::Setlife()
-{
-    if (!isLocalPlayer) return;  // 로컬 플레이어만
-
-    if (life > 1)
-    {
-        life -= 1;
-        hitcolor = glm::vec4(1.0f, 0.6f, 0.6f, 1.0f);
-    }
-    else if (life > 0)
-    {
-        life -= 1;
-        hit_cnt = 200;
-        hitcolor = glm::vec4(1.0f, 0.6f, 0.6f, 1.0f);
-        dying = true;
-        _Right = { false };
-        _Left = { false };
-        _Top = { false };
-        _Bottom = { false };
-        _Shift = { false };
-        hitbox_on = { false };
-    }
-}
-
-void Character::SetAnimationType(const std::string& animName)
-{
-    if (animLibrary && player_CurrentAnim) {
-        animLibrary->ChangeAnimation(animName, *player_CurrentAnim);
-    }
+    else if (animLibrary->GetCurrentAnimation() == "Die")
+        animLibrary->ChangeAnimation("Idle", *player_CurrentAnim);
 }
 
 void Character::UpdateFromPacket(float ang, float x, float y, float z, char direction, bool move, bool run)
@@ -628,6 +431,19 @@ void Character::UpdateFromPacket(float ang, float x, float y, float z, char dire
     currentDirection = direction;
     isMoving = move;
     isRunning = run;
+}
+
+void Character::ReviveFromPacket(float x, float y, float z)
+{
+    characterPos = glm::vec3(x, y, z);
+    SetTargetPosition(x, y, z);
+    dead = false;
+}
+
+void Character::DamagedFromPacket()
+{
+    hit_cnt = 200;
+    hitcolor = glm::vec4(1.0f, 0.6f, 0.6f, 1.0f);
 }
 
 void Character::SetTargetPosition(float x, float y, float z)

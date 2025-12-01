@@ -1,23 +1,5 @@
 #pragma once
 
-// vt
-//class IA
-//{
-//public: 
-//};
-//
-//class B : public IA
-//{
-//
-//};
-//
-//class C : public IA
-//{
-//
-//};
-
-// vector<long long*> s = 
-
 class CrossHair;
 
 class Camera final {

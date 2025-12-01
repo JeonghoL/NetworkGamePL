@@ -38,12 +38,12 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		{
 			if (action == GLFW_PRESS)
 			{
-				input->mainCat->Shift_on(true);
+				input->mainCat->SetShift(true);
 				input->SendMovePacket();
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				input->mainCat->Shift_on(false);
+				input->mainCat->SetShift(false);
 				input->SendMovePacket();
 			}
 		}
@@ -59,12 +59,12 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		{
 			if (action == GLFW_PRESS)
 			{
-				input->mainCat->SetRight_on(true);
+				input->mainCat->SetRight(true);
 				input->SendMovePacket();
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				input->mainCat->SetRight_on(false);
+				input->mainCat->SetRight(false);
 				input->SendMovePacket();
 			}
 		}
@@ -74,12 +74,12 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		{
 			if (action == GLFW_PRESS)
 			{
-				input->mainCat->SetLeft_on(true);
+				input->mainCat->SetLeft(true);
 				input->SendMovePacket();
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				input->mainCat->SetLeft_on(false);
+				input->mainCat->SetLeft(false);
 				input->SendMovePacket();
 			}
 		}
@@ -89,12 +89,12 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		{
 			if (action == GLFW_PRESS)
 			{
-				input->mainCat->SetTop_on(true);
+				input->mainCat->SetTop(true);
 				input->SendMovePacket();
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				input->mainCat->SetTop_on(false);
+				input->mainCat->SetTop(false);
 				input->SendMovePacket();
 			}
 		}
@@ -104,12 +104,12 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		{
 			if (action == GLFW_PRESS)
 			{
-				input->mainCat->SetBottom_on(true);
+				input->mainCat->SetBottom(true);
 				input->SendMovePacket();
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				input->mainCat->SetBottom_on(false);
+				input->mainCat->SetBottom(false);
 				input->SendMovePacket();
 			}
 		}
@@ -119,10 +119,10 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		{
 			if (action == GLFW_PRESS)
 			{
-				if (input->mainCat->hitbox_ison())
-					input->mainCat->hitboxOnOff(false);
+				if (input->mainCat->GetHitBox())
+					input->mainCat->SetHitBox(false);
 				else
-					input->mainCat->hitboxOnOff(true);
+					input->mainCat->SetHitBox(true);
 			}
 		}
 		break;
@@ -201,48 +201,6 @@ void Input::Scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		input->camera->HandleScroll(yoffset);
 }
 
-void Input::MouseFunc(GLFWwindow* window, int button, int action, int mods)
-{
-	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-
-	// mainCat이 없으면 graphics에서 동적으로 가져오기
-	if (!input->mainCat && input->graphics) {
-		input->mainCat = input->graphics->GetLocalCharacter();
-	}
-
-	// 로컬 캐릭터가 아직 생성되지 않았으면 아무것도 하지 않음
-	if (!input->mainCat) {
-		return;
-	}
-
-	switch (button)
-	{
-	case GLFW_MOUSE_BUTTON_LEFT:
-		if (input->camera->Get_start_pos() == 0 && !input->mainCat->GetDying() /*&& !finish*/)
-		{
-			if (action == GLFW_PRESS)
-			{
-				input->SendAttackPacket();
-				cout << "attack packet has send" << '\n';
-			}
-			else if (action == GLFW_RELEASE)
-			{
-				input->SendAttackEndPacket();
-				cout << "attackend packet has send" << '\n';
-			}
-		}
-		break;
-	}
-
-	// 수정필요
-	/*if (input->mainCat->GetFiring() && input->mainCat->GetAnimLibrary()->GetCurrentAnimation() == "Run")
-		input->mainCat->GetAnimLibrary()->ChangeAnimation("FireRun", *input->mainCat->GetCurrentAnim());
-	else if (input->mainCat->GetFiring() && input->mainCat->GetAnimLibrary()->GetCurrentAnimation() == "Walk")
-		input->mainCat->GetAnimLibrary()->ChangeAnimation("FireWalk", *input->mainCat->GetCurrentAnim());
-	else if (input->mainCat->GetFiring() && input->mainCat->GetAnimLibrary()->GetCurrentAnimation() == "Idle")
-		input->mainCat->GetAnimLibrary()->ChangeAnimation("Fire", *input->mainCat->GetCurrentAnim());*/
-}
-
 void Input::MouseMoveFunc(GLFWwindow* window, double xpos, double ypos)
 {
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
@@ -282,37 +240,52 @@ void Input::Update(GLFWwindow* window)
 
 void Input::CheckContinuousAttack(GLFWwindow* window)
 {
-	if (!mainCat) return;
+	if (!mainCat || mainCat->GetDying()) return;
 
 	bool isMousePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
-	if (isMousePressed && camera->Get_start_pos() == 0 && !mainCat->GetDying())
+	std::string currentAnim = mainCat->GetAnimLibrary()->GetCurrentAnimation();
+	bool isFireAnim = (currentAnim == "Fire" || currentAnim == "FireWalk" || currentAnim == "FireRun");
+
+	if (isMousePressed && camera->Get_start_pos() == 0)
 	{
 		if (!isAttacking)
 		{
-			// 첫 공격 시작
-			isAttacking = true;
-			SendAttackPacket();
-			firstAttackSent = true;
-			cout << "first attack packet has send" << '\n';
+			if (!isFireAnim)
+			{
+				// 첫 공격 시작
+				isAttacking = true;
+				SendAttackPacket();
+				firstAttackSent = true;
+				//cout << "first attack packet has send" << '\n';
+			}
+			else
+			{
+				AnimInfo* currentAnimInfo = mainCat->GetCurrentAnim();
+
+				if (currentAnimInfo->CurrentTime + 50.0f >= currentAnimInfo->Duration)
+				{
+					// 첫 공격 시작
+					isAttacking = true;
+					SendAttackPacket();
+					firstAttackSent = true;
+					//cout << "first attack packet has send" << '\n';
+				}
+			}
 		}
 		else
 		{
-			// 연속 공격 체크 로직
-			std::string currentAnim = mainCat->GetAnimLibrary()->GetCurrentAnimation();
-			bool isFireAnim = (currentAnim == "Fire" || currentAnim == "FireWalk" || currentAnim == "FireRun");
-
 			if (isFireAnim)
 			{
 				AnimInfo* currentAnimInfo = mainCat->GetCurrentAnim();
 
-				if (currentAnimInfo->CurrentTime + 10.0f >= currentAnimInfo->Duration)
+				if (currentAnimInfo->CurrentTime + 50.0f >= currentAnimInfo->Duration)
 				{
 					if (!wasFireAnimation)
 					{
 						SendAttackPacket();
 						wasFireAnimation = true;
-						cout << "continuous attack packet has send" << '\n';
+						//cout << "continuous attack packet has send" << '\n';
 					}
 				}
 				else
@@ -329,7 +302,7 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 		{
 			// attack end 패킷 전송
 			SendAttackEndPacket();
-			cout << "attack end packet has send" << '\n';
+			//cout << "attack end packet has send" << '\n';
 
 			// 상태 초기화
 			isAttacking = false;
@@ -366,7 +339,7 @@ void Input::SendMovePacket()
 	if (!network) return;
 
 	char direction = GetCurrentDirection();
-	bool isRunning = mainCat->Shift_value();
+	bool isRunning = mainCat->GetShift();
 
 	vector<char> packet = PacketFactory::CSMovePacket(lastMouseAngle, direction, isRunning);
 	network->Send(packet);
@@ -379,19 +352,20 @@ void Input::SendAttackPacket()
 	glm::vec3 position = mainCat->GetPosition();
 	position.y = 0.45f;
 
-	float angle = atan2(mouseDir.x, mouseDir.z);
-
-	position.x += cos(angle) * 0.2f;
-	position.z -= sin(angle) * 0.2f;
-
+	// 과거 방식처럼 mousePick 사용
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIN_W / (float)WIN_H, 0.1f, 1000.0f);
 	glm::mat4 view = camera->GetViewMatrix(mainCat->GetPosition());
 
 	glm::vec3 mousePick = camera->GetMousePicking(cur_x, cur_y, projection, view);
-
 	glm::vec3 targetPos = mousePick;
 	targetPos.y = 0.45f;
 
+	// 시작 위치 조정 (과거 방식과 동일)
+	float tempAngle = atan2(mouseDir.x, mouseDir.z);
+	position.x += cos(tempAngle) * 0.2f;
+	position.z -= sin(tempAngle) * 0.2f;
+
+	// 실제 목표점으로 방향 계산
 	glm::vec3 direction = glm::normalize(targetPos - position);
 
 	vector<char> packet = PacketFactory::CSAttackPacket(direction);

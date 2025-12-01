@@ -238,8 +238,8 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 					glm::vec3 startPos(addPacket.x, addPacket.y, addPacket.z);
 					character->CreateBulletFromServer(addPacket.id, startPos);
 
-					std::cout << "[ADD BULLET] ID: " << addPacket.id << " Owner: " << ownerID
-						<< " at (" << addPacket.x << ", " << addPacket.y << ", " << addPacket.z << ")" << std::endl;
+					/*std::cout << "[ADD BULLET] ID: " << addPacket.id << " Owner: " << ownerID
+						<< " at (" << addPacket.x << ", " << addPacket.y << ", " << addPacket.z << ")" << std::endl;*/
 				}
 			}
 		}
@@ -256,7 +256,7 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 				if (character) {
 					character->UpdateFromPacket(movePacket.angle, movePacket.x, movePacket.y, movePacket.z, -1, movePacket.isMove, movePacket.isRun);
 				}
-				cout << movePacket.id << " : Move packet" << " Move packet : " << movePacket.isMove << '\n';
+				//cout << movePacket.id << " : Move packet" << " Move packet : " << movePacket.isMove << '\n';
 			}
 			else {
 				// 총알 이동 처리 - 모든 캐릭터에서 해당 총알 찾기
@@ -301,7 +301,7 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 			}
 		}
 
-		std::cout << "[REMOVE PLAYER] ID: " << removePacket.id << std::endl;
+		//std::cout << "[REMOVE PLAYER] ID: " << removePacket.id << std::endl;
 		break;
 	}
 	case SC_ATTACK:
@@ -311,7 +311,7 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 		if (graphics) {
 			Character* character = graphics->GetCharacter(attackPacket.id);
 			if (character) {
-				std::cout << "[ATTACK] Player ID: " << attackPacket.id << std::endl;
+				//std::cout << "[ATTACK] Player ID: " << attackPacket.id << std::endl;
 				character->SetFiring(true);
 			}
 		}
@@ -324,8 +324,47 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 		if (graphics) {
 			Character* character = graphics->GetCharacter(attackEndPacket.id);
 			if (character) {
-				std::cout << "[ATTACKEND] Player ID: " << attackEndPacket.id << std::endl;
+				//std::cout << "[ATTACKEND] Player ID: " << attackEndPacket.id << std::endl;
 				character->SetFiring(false);
+			}
+		}
+		break;
+	}
+	case SC_DEAD:
+	{
+		SC_DEAD_PACKET deadPacket = PacketFactory::Deserialize<SC_DEAD_PACKET>(packet);
+
+		if (graphics) {
+			Character* character = graphics->GetCharacter(deadPacket.id);
+			if (character) {
+				character->SetDying(true);
+				cout << deadPacket.id << ": Dead!!" << '\n';
+			}
+		}
+		break;
+	}
+	case SC_REVIVE:
+	{
+		SC_REVIVE_PACKET revivePacket = PacketFactory::Deserialize<SC_REVIVE_PACKET>(packet);
+
+		if (graphics) {
+			Character* character = graphics->GetCharacter(revivePacket.id);
+			if (character) {
+				character->SetDying(false);
+				character->ReviveFromPacket(revivePacket.x, revivePacket.y, revivePacket.z);
+				cout << revivePacket.id << ": Revived!!" << '\n';
+			}
+		}
+		break;
+	}
+	case SC_STAT_UPDATE:
+	{
+		SC_STAT_UPDATE_PACKET statPacket = PacketFactory::Deserialize<SC_STAT_UPDATE_PACKET>(packet);
+
+		if (graphics) {
+			Character* character = graphics->GetCharacter(statPacket.id);
+			if (character) {
+				character->DamagedFromPacket();
 			}
 		}
 		break;
