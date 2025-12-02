@@ -1,6 +1,6 @@
 #pragma once
 
-struct CollisionBox
+struct CollisionBox 
 {
 	float minX, maxX, minZ, maxZ;
 
@@ -15,9 +15,16 @@ public:
 	void Init();
 
 	bool IsInsideCollisionBox(float x, float z);
+	bool IsInsidePVPBox(float x, float z);
 
 private:
 	std::vector<CollisionBox> collisionBoxes;
+	CollisionBox pvpBox = { -15.0727f, 15.1275f, -14.9065f, 14.9373f };
 	bool initialized = { false };
+
+	//x- 왼쪽
+	//x+ 오른쪽
+	//z- 위
+	//z+ 아래
 };
 

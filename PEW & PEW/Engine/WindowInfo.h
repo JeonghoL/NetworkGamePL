@@ -2,13 +2,13 @@
 
 class WindowInfo
 {
-public:
 	DECLARE_SINGLE(WindowInfo);
 
+public:
 	void Init();
 	GLFWwindow* GetWindow() { return window; }
 
 private:
-	GLFWwindow* window = nullptr;
-	const char* basename = "PEW & PEW";
+	GLFWwindow* window = { nullptr };
+	const char* basename = { "PEW & PEW" };
 };

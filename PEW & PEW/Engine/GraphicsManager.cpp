@@ -3,12 +3,15 @@
 #include "Skybox.h"
 #include "StaticObjectManager.h"
 #include "ShadowMapping.h"
+#include "SoundManager.h"
 #include "Camera.h"
 #include "Timer.h"
 #include "NetworkManager.h"
 #include "MainCharacter.h"
 #include "AlienCharacter.h"
 #include "SceneManager.h"
+#include "Fade.h"
+#include "EffectManager.h"
 
 void GraphicsManager::Init()
 {
@@ -17,17 +20,27 @@ void GraphicsManager::Init()
 
 	camera = new Camera();
 	shadowMap = new ShadowMapping();
+	fade = new Fade();
+	fade->Init();
 
-	AddCharacter(0, true, 0.1f);
+	effect = new EffectManager();
+	effect->Init();
 
+	effect->PlayEffect("CandleFire", glm::vec3{ -35.0322f, 2.0f, 44.6548f });
+
+	glm::vec3 localPos = glm::vec3(-37.3051f, 0.0f, 42.5001f);
+	AddCharacter(0, localPos, 0, true, 0.1f);
 	InitAlienCharacters();
 }
 
-void GraphicsManager::Update(SceneType type)
+void GraphicsManager::InitPVPMap()
 {
-	float deltaTime = GET_SINGLE(Timer)->GetDeltaTime();
+	GET_SINGLE(StaticObjectManager)->InitPVPMap();
+}
 
-	camera->Update();
+void GraphicsManager::Update(SceneType type, SoundManager& soundmanager, const float deltaTime)
+{
+	camera->Update(soundmanager, deltaTime);
 
 	int scenetype = static_cast<int>(type);
 
@@ -36,16 +49,35 @@ void GraphicsManager::Update(SceneType type)
 		MainCharacter* cat = GetLocalCharacter();
 		cat->Update(deltaTime, alienCharacters);
 		UpdateAlienCharacters(deltaTime);
+		GET_SINGLE(StaticObjectManager)->Update(deltaTime);
 	}
 	else
 	{
 		for (auto& [id, character] : catCharacters) {
 			character->Update(deltaTime);
 		}
+
+		MainCharacter* localPlayer = GetLocalCharacter();
+		if (localPlayer) {
+			GET_SINGLE(StaticObjectManager)->UpdatePVPPlayerPosition(localPlayer->GetPosition());
+		}
+
+		GET_SINGLE(StaticObjectManager)->Update(deltaTime);
 	}
+
+	effect->Update(deltaTime);
+
+	UpdateLightAngle(deltaTime);
 }
 
-void GraphicsManager::Render(GLFWwindow* window, SceneType type)
+void GraphicsManager::UpdateLightAngle(const float deltaTime)
+{
+	if (light_angle > 6.28f)
+		light_angle -= 6.28f;
+	light_angle += 0.1f * deltaTime;
+}
+
+void GraphicsManager::Render(SceneType type, SoundManager& soundmanager)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	float deltatime = GET_SINGLE(Timer)->GetDeltaTime();
@@ -89,7 +121,30 @@ void GraphicsManager::Render(GLFWwindow* window, SceneType type)
 
 	camera->Render();
 
+	glm::vec3 cameraFront = camera->GetFrontVector(localChar->GetPosition());
+	glm::vec3 cameraTarget = viewPos + cameraFront;
+	effect->Render(viewPos, cameraTarget);
+
+	RenderFade(projection, view, viewPos);
+
+	if (!firstRenderDone)
+	{
+		soundmanager.PlayBGM();
+		firstRenderDone = true;
+	}
+
 	glFinish();
+}
+
+void GraphicsManager::RenderFade(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& viewPos)
+{
+	MainCharacter* localChar = GetLocalCharacter();
+
+	if (localChar) {
+		glm::vec3 frontDir = camera->GetFrontVector(localChar->GetPosition());
+		fade->Render(projection, view, viewPos, frontDir);
+	}
+	
 }
 
 void GraphicsManager::RenderShadow(SceneType type)
@@ -169,6 +224,17 @@ void GraphicsManager::Release()
 
 	delete shadowMap;
 	delete camera;
+
+	fade->Release();
+	delete fade;
+
+	effect->Release();
+	delete effect;
+}
+
+void GraphicsManager::ReleaseScene1()
+{
+	GET_SINGLE(StaticObjectManager)->Release();
 }
 
 void GraphicsManager::InitAlienCharacters()
@@ -189,17 +255,17 @@ void GraphicsManager::UpdateAlienCharacters(float deltatime)
 	for (int type = 0; type < 3; ++type) {
 		for (int location = 0; location < 9; ++location) {
 			if (alienCharacters[type][location] && !alienCharacters[type][location]->GetDead()) {
-				alienCharacters[type][location]->Update(deltatime, localChar);
+				alienCharacters[type][location]->Update(deltatime, localChar, alienCharacters);
 			}
 		}
 	}
 }
 
-void GraphicsManager::AddCharacter(int id, bool isLocal, float speed)
+void GraphicsManager::AddCharacter(int id, glm::vec3 cPos, int characterType, bool isLocal, float speed)
 {
 	if (catCharacters.find(id) == catCharacters.end()) {
-		MainCharacter* newChar = new MainCharacter(id, isLocal, speed);
-		newChar->Init();
+		MainCharacter* newChar = new MainCharacter(id, cPos, isLocal, speed);
+		newChar->Init(characterType);
 		catCharacters[id] = newChar;
 
 		if (isLocal) {
@@ -251,6 +317,11 @@ MainCharacter* GraphicsManager::GetMainCat()
 	return GetLocalCharacter();
 }
 
+Fade* GraphicsManager::GetFade()
+{
+	return fade;
+}
+
 void GraphicsManager::DebugAllCharacterPositions()
 {
 	std::cout << "\n=== 모든 캐릭터 위치 디버깅 ===" << std::endl;
@@ -288,7 +359,7 @@ void GraphicsManager::DebugAllCharacterPositions()
 	std::cout << "=============================\n" << std::endl;
 }
 
-void GraphicsManager::SetSceneManager(SceneManager* sm)
+void GraphicsManager::SetSceneManager(SceneManager* sm) 
 {
 	MainCharacter* localChar = GetLocalCharacter();
 	if (localChar) {

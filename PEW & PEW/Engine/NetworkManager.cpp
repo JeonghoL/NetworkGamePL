@@ -3,6 +3,7 @@
 #include "PacketFactory.h"
 #include "GraphicsManager.h"
 #include "MainCharacter.h"
+#include "StaticObjectManager.h"
 
 NetworkManager::NetworkManager()
 {
@@ -219,7 +220,8 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 				bool isLocal = firstCharacter;
 				firstCharacter = false;
 
-				graphics->AddCharacter(addPacket.id, isLocal, 20.0f);
+				glm::vec3 addCharacterPos = glm::vec3(addPacket.x, addPacket.y, addPacket.z);
+				graphics->AddCharacter(addPacket.id, addCharacterPos, addPacket.textureId, isLocal, 20.0f);
 
 				MainCharacter* character = graphics->GetCharacter(addPacket.id);
 				if (character) {
@@ -369,6 +371,23 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 		}
 		break;
 	}
+	case SC_GAME_START:
+	{
+		SC_GAME_START_PACKET startPacket = PacketFactory::Deserialize<SC_GAME_START_PACKET>(packet);
+
+		canStart = true;
+		break;
+	}
+	case SC_GAME_WIN:
+	{
+		GET_SINGLE(StaticObjectManager)->SetPlayerState(PlayerPVPState::WIN);
+		break;
+	}
+	case SC_GAME_LOSE:
+	{
+		GET_SINGLE(StaticObjectManager)->SetPlayerState(PlayerPVPState::LOSE);
+		break;
+	}
 	default:
 		std::cout << "[UNKNOWN PACKET] Type: " << (int)packetType << std::endl;
 		break;
@@ -378,4 +397,9 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 bool NetworkManager::IsConnected() const
 {
 	return isConnected;
+}
+
+bool NetworkManager::CanStart() const
+{
+	return canStart;
 }

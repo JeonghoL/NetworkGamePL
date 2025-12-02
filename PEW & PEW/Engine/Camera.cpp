@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "CrossHair.h"
 #include "WindowInfo.h"
+#include "SoundManager.h"
 
 Camera::Camera()
 {
@@ -33,11 +34,11 @@ void Camera::Render()
         tpscrosshair->RenderCrosshair();
 }
 
-void Camera::Update()
+void Camera::Update(SoundManager& soundmanager, const float deltaTime)
 {
     if (start)
     {
-        Starting();
+        Starting(soundmanager, deltaTime);
     }
 
     HandleMouseMovement(cur_x, cur_y);
@@ -122,14 +123,15 @@ void Camera::HandleScroll(double yoffset)
     }
 }
 
-void Camera::Starting()
+void Camera::Starting(SoundManager& soundmanager, const float deltaTime)
 {
     if (start_pos > 0.0f)
-        start_pos -= 0.1f;
+        start_pos -= 25.0f * deltaTime;
     else if (start_pos < 0.0f)
     {
         start_pos = 0.0f;
 
+        soundmanager.ChangeBGM("music/chipi.mp3");
         //startbgm->setIsPaused(true);
         //basebgm->setIsPaused(false);
         //cloud_go = true;
@@ -239,6 +241,30 @@ glm::vec3 Camera::GetMousePicking(float mouseX, float mouseY,
     glm::vec3 planeIntersection = rayOrigin + rayDir * t;
 
     return planeIntersection;
+}
+
+glm::vec3 Camera::GetFrontVector(const glm::vec3& targetPos)
+{
+    if (FirstPersonView) {
+        // 1인칭: 이미 있는 look_direction 로직 사용
+        return glm::vec3(
+            sin(camera_horizontal_angle) * cos(camera_vertical_angle),
+            -sin(camera_vertical_angle),
+            cos(camera_horizontal_angle) * cos(camera_vertical_angle)
+        );
+    }
+    else {
+        if (LeftAlt_on) {
+            // Alt 모드: 카메라에서 타겟으로의 방향
+            glm::vec3 cameraPos = GetPosition(targetPos);
+            return glm::normalize(targetPos - cameraPos);
+        }
+        else {
+            // 일반 3인칭: 간단하게 카메라에서 캐릭터로의 방향
+            glm::vec3 cameraPos = GetPosition(targetPos);
+            return glm::normalize(targetPos - cameraPos);
+        }
+    }
 }
 
 //void Camera::addfinishpos()

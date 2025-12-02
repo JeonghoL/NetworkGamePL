@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Engine.h"
+#include "SoundManager.h"
 #include "SceneManager.h"
 #include "NetworkManager.h"
 #include "WindowInfo.h"
@@ -12,8 +13,11 @@ void Engine::Init()
 	GET_SINGLE(WindowInfo)->Init();
 	GET_SINGLE(Timer)->Init();
 
+	soundManager = new SoundManager();
+	soundManager->Init();
+
 	sceneManager = new SceneManager();
-	sceneManager->Init();
+	sceneManager->Init(*soundManager);
 }
 
 void Engine::Update()
@@ -22,8 +26,9 @@ void Engine::Update()
 
 	while (!glfwWindowShouldClose(window)) {
 		GET_SINGLE(Timer)->Update();
-		sceneManager->Update(window);
-		sceneManager->Render(window);
+		const float deltaTime = GET_SINGLE(Timer)->GetDeltaTime();
+		sceneManager->Update(window, deltaTime);
+		sceneManager->Render();
 
 		ShowFps();
 
@@ -34,6 +39,9 @@ void Engine::Update()
 
 void Engine::Release()
 {
+	soundManager->Release();
+	delete soundManager;
+
 	sceneManager->Release();
 	delete sceneManager;
 }

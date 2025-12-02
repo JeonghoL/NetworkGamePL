@@ -137,7 +137,7 @@ public:
 
 public:
 	AnimatedModel();
-	void LoadGLBFile(int j, vector<BoneInfo>& BoneInfoName, const std::string& filename, GLuint& VAO, GLuint& VBO, GLuint& VBO2, GLuint& EBO, vector<unsigned int>& Indices);
+	void LoadGLBFile(int j, vector<BoneInfo>& BoneInfoName, const std::string& filename, GLuint& VAO, GLuint& VBO, GLuint& VBO2, GLuint& EBO, vector<unsigned int>& Indices); 
 	void SetupBoneTransforms(const vector<BoneInfo>& BoneInfoName, GLuint shadername);
 	void UpdateAnimation(int j, vector<BoneInfo>& BoneInfoName, float deltaTime, AnimInfo& currentAnim);
 
@@ -147,7 +147,7 @@ private:
 	void CalculateNodeTransform(int j, vector<BoneInfo>& BoneInfoName, const aiNode* pNode, const glm::mat4& ParentTransform, const AnimInfo& currentAnim);
 
 	void LoadBones(const aiMesh* mesh, vector<BoneInfo>& BoneInfoName);
-
+	
 private:
 	int Get_Bone_Id(const aiBone* pBone);
 	void Parse_Single_Bone(int mesh_index, const aiBone* pBone);

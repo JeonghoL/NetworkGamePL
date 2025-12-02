@@ -18,7 +18,7 @@ public:
 	AlienCharacter(int type, int location);
 	~AlienCharacter();
 
-	void Update(float deltaTime, MainCharacter* Cat);
+	void Update(float deltaTime, MainCharacter* Cat, const std::array<std::array<AlienCharacter*, 9>, 3>& allAliens);
 
 	void Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 viewPos, float deltaTime, glm::mat4 lightSpaceMatrix, GLuint depthMap);
 	void DrawShadow(ShadowMapping* shadowMap);
@@ -33,21 +33,23 @@ public:
 	void SetupShaders();
 
 	void RotateAliens(MainCharacter* Cat);
-	void ChangeAnimation(float deltaTime);
-	void UpdateStateAndBehavior(MainCharacter* Cat);
-	void MoveToward(MainCharacter* Cat);
+	void ChangeAnimation();
+	void UpdateStateAndBehavior(MainCharacter* Cat, const float deltaTime, const std::array<std::array<AlienCharacter*, 9>, 3>& allAliens);
+	void MoveToward(MainCharacter* Cat, const float deltaTime, const std::array<std::array<AlienCharacter*, 9>, 3>& allAliens);
 
 	void ActivateBullets();
 	void DeactivateBullets();
-	void UpdateBullets(MainCharacter* Cat);
+	void UpdateBullets(MainCharacter* Cat, const float deltaTime);
+	void CheckBulletWallHit(int bulletIndex);
 
-	void UpdateHitDecision();
+	void UpdateHitDecision(const float deltaTime);
 	void SetHit();
 	void SetDying() { dying = true; }
 
 	const glm::vec3& GetPosition() const { return alienPos; }
 	bool GetDying() const { return dying; }
 	bool GetDead() const { return dead; }
+	glm::vec3 GetAvoidanceVector(const std::array<std::array<AlienCharacter*, 9>, 3>& allAliens) const;
 
 private:
 	// 적 정보
@@ -60,7 +62,7 @@ private:
 	bool shotFired[10] = { false };
 
 	glm::vec4 hitcolor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	int hit_cnt = { 200 };
+	float hit_cnt = { 2.0f };
 
 	// 적 종류와 위치
 	int alienType;
@@ -84,5 +86,7 @@ private:
 
 	// 공격선 OPENGL
 	GLuint lVAO, lVBO, lShaderprogram;
+
+	float avoidanceRadius = 1.5f;
 };
 

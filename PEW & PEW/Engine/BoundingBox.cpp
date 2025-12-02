@@ -33,7 +33,7 @@ void BoundingBox::RenderHitbox(float angle, const glm::vec3& pos, const glm::mat
 
 void BoundingBox::SetupHitboxBuffers()
 {
-
+    
     vector<float> vertices = {
         -0.25f, 0.95f, -0.2f,  0.25f, 0.95f, -0.2f,
          0.25f, 0.95f, -0.2f,  0.25f, 0.95f, 0.2f,
@@ -42,7 +42,7 @@ void BoundingBox::SetupHitboxBuffers()
 
         -0.25f, 0.0f, -0.2f,   0.25f, 0.0f, -0.2f,
          0.25f, 0.0f, -0.2f,   0.25f, 0.0f,  0.2f,
-         0.25f, 0.0f,  0.2f,  -0.25f, 0.0f,  0.2f,
+         0.25f, 0.0f,  0.2f,  -0.25f, 0.0f,  0.2f,  
         -0.25f, 0.0f,  0.2f,  -0.25f, 0.0f, -0.2f,
 
         -0.25f, 0.95f, -0.2f, -0.25f,  0.0f, -0.2f,

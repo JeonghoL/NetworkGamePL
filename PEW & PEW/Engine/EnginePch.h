@@ -30,6 +30,8 @@ using namespace std;
 #include <assimp/scene.h>
 #include <assimp/DefaultLogger.hpp>
 
+#include <fmod.hpp>
+
 // ∞¢¡æ lib
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glew32.lib")
@@ -43,6 +45,8 @@ using namespace std;
 #pragma comment(lib, "assimp-vc143-mt.lib")
 #endif
 
+#pragma comment(lib, "fmod_vc.lib")
+
 // ∞¢¡æ typedef
 using int8 = __int8;
 using int16 = __int16;
@@ -52,6 +56,14 @@ using uint8 = unsigned __int8;
 using uint16 = unsigned __int16;
 using uint32 = unsigned __int32;
 using uint64 = unsigned __int64;
+
+enum class PlayerPVPState {
+	WAITING,
+	READY,
+	FIGHT,
+	WIN,
+	LOSE
+};
 
 // ΩÃ±€≈Ê ∏≈≈©∑Œ
 #define DECLARE_SINGLE(type)		\

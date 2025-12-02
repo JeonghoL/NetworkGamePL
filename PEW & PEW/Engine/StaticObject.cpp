@@ -2,11 +2,12 @@
 #include "StaticObject.h"
 #include "stb_image.h"
 
-StaticObject::StaticObject(const char* glb, const char* png)
+StaticObject::StaticObject(const char* glb, const char* png, const char* let)
 {
 	SetupShader("Shaders/StaticObjectVert.glsl", "Shaders/StaticObjectFrag.glsl", shaderprogram);
 	LoadStaticObjectGLB(glb);
 	Texture = LoadTexture(png);
+	name = let;
 }
 
 StaticObject::~StaticObject()
@@ -94,6 +95,10 @@ void StaticObject::LoadStaticObjectGLB(const std::string& filename) {
 void StaticObject::drawStaticobject(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos,
 	glm::mat4 lightSpaceMatrix, GLuint shadowMap)
 {
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, position);
+	model = glm::scale(model, scale);
+
 	glUseProgram(shaderprogram);
 	ViewLoc = glGetUniformLocation(shaderprogram, "view");
 	glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &orgview[0][0]);
@@ -208,6 +213,10 @@ void StaticObject::drawStaticobject(const glm::mat4& orgview, const glm::mat4& o
 
 void StaticObject::drawStaticobjectShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader)
 {
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, position);
+	model = glm::scale(model, scale);
+
 	glUseProgram(depthShader);
 	glUniformMatrix4fv(glGetUniformLocation(depthShader, "lightSpaceMatrix"),
 		1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
@@ -215,4 +224,19 @@ void StaticObject::drawStaticobjectShadow(const glm::mat4& lightSpaceMatrix, GLu
 		1, GL_FALSE, glm::value_ptr(model));
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void StaticObject::MoveStaticobject(const float deltaTime)
+{
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 1.0f * deltaTime));
+}
+
+void StaticObject::MoveStaticobjectToBeginPos()
+{
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -236.0f));
+}
+
+const char* StaticObject::GetName()
+{
+	return name;
 }

@@ -18,10 +18,10 @@ struct CatBulletSlot {
 class MainCharacter
 {
 public:
-    MainCharacter(int id, bool isLocal = false, float speed = 0.1f);
+    MainCharacter(int id, glm::vec3 cPos, bool isLocal = false, float speed = 0.1f);
     ~MainCharacter();
 
-    void Init();
+    void Init(int type);
     void Update(float deltaTime);
     void Update(float deltaTime, array<array<AlienCharacter*, 9>, 3>& aliens);
     void Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 viewPos, float deltaTime, glm::mat4 lightSpaceMatrix, GLuint depthMap);
@@ -45,6 +45,7 @@ public:
     void SetFiring(bool in) { firing = in; }
     void SetCamera(Camera* cam) { if (isLocalPlayer) camera = cam; }
     void SetAngle(float ang) { angle = ang; }
+    void SetCharacterType(int type) { Texture = texture[type]; }
 
     // 네트워크 업데이트 (원격 플레이어만)
     void UpdateFromPacket(float ang, float x, float y, float z, char direction = -1, bool move = false, bool run = false);
@@ -54,24 +55,25 @@ public:
 
     // 애니메이션
     void SaveAnimations();
-    void UpdateAnimation(float deltaTime);
+    void UpdateAnimation();
 
     // 로컬 (Scene1) 전용
     void UpdateLocalPlayerMovement(float deltaTime);
     void UpdateLocalPlayerState();
     void LocalMove(float deltaTime);
-    void UpdateLocalBullets(array<array<AlienCharacter*, 9>, 3>& aliens);
+    void UpdateLocalBullets(array<array<AlienCharacter*, 9>, 3>& aliens, const float deltaTime);
     void CreateLocalBullet();
     void CheckFireAnimationTiming();
     void CheckBulletAlienHit(int bulletIndex, array<array<AlienCharacter*, 9>, 3>& aliens);
-    void UpdateLocalPlayerRevive();
+    void CheckBulletWallHit(int bulletIndex);
+    void UpdateLocalPlayerRevive(const float deltaTime);
     void CheckLocalEnd(array<array<AlienCharacter*, 9>, 3>& aliens);
     void ResetAllStates();
     void GoToEndPosition() { characterPos = glm::vec3(-45.0f, 0.0f, -40.0f); }  // 잠시 사용하기 위해 만든 함수
 
     // 공통 함수
     void UpdateAllPlayersMovement(float deltaTime);
-    void UpdateHitDecision();
+    void UpdateHitDecision(const float deltaTime);
     void SetSceneManager(SceneManager* sm) { sceneManager = sm; }
 
     // Getter
@@ -105,10 +107,10 @@ private:
 
     // 캐릭터 상태
     bool dying = { false }, dead = { false };
-    int hit_cnt = { 0 };
+    float hit_cnt = { 0 };
     bool firing = { false };
     int life = { 5 };       // local life
-    int reviveCount = { 300 };
+    float reviveCount = { 3.0f };
 
     // 입력
     bool _Right = { false }, _Left = { false }, _Top = { false }, _Bottom = { false };
@@ -141,7 +143,7 @@ private:
     std::vector<std::unique_ptr<Assimp::Importer>> animationImporters;
 
     // OpenGL
-    GLuint VAO, VBO, VBO2, EBO, shaderprogram, Texture;
+    GLuint VAO, VBO, VBO2, EBO, shaderprogram, Texture, texture[3];
     GLuint ViewLoc, ProjLoc, ModelLoc, TextureLoc, UseTextureLoc, colorHitLoc;
     std::vector<unsigned int> Indices;
     glm::mat4 model;

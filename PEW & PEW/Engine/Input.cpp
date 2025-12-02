@@ -6,10 +6,14 @@
 #include "GraphicsManager.h"
 #include "MainCharacter.h"
 #include "WindowInfo.h"
+#include "SoundManager.h"
 
 void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
+
+	if (input->blockInput)
+		return;
 
 	// mainCat이 없으면 graphics에서 동적으로 가져오기
 	if (!input->mainCat && input->graphics) {
@@ -26,13 +30,13 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		if (action == GLFW_PRESS)
 			input->camera->SetStart(true);
 		break;
-	case GLFW_KEY_Q:
-		if ((!(input->camera->Get_start_pos() == 0) && !input->mainCat->GetDead())/* || finish*/)
-		{
-			if (action == GLFW_PRESS)
-				glfwSetWindowShouldClose(window, GL_TRUE);
-		}
-		break;
+	//case GLFW_KEY_Q:
+	//	if ((!(input->camera->Get_start_pos() == 0) && !input->mainCat->GetDead())/* || finish*/)
+	//	{
+	//		if (action == GLFW_PRESS)
+	//			glfwSetWindowShouldClose(window, GL_TRUE);
+	//	}
+	//	break;
 	case GLFW_KEY_LEFT_SHIFT:
 		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
 		{
@@ -51,10 +55,14 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		}
 		break;
 	case GLFW_KEY_C:
-		if (action == GLFW_PRESS)
+		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()))
 		{
-			input->graphics->DebugAllCharacterPositions();
-			input->mainCat->GoToEndPosition();
+			if (action == GLFW_PRESS)
+			{
+				//input->graphics->DebugAllCharacterPositions();
+				if (input->sceneType == SceneType::Scene1)
+					input->mainCat->GoToEndPosition();
+			}
 		}
 		break;
 	case GLFW_KEY_D:
@@ -137,19 +145,19 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 			}
 		}
 		break;
-	case GLFW_KEY_V:
-		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
-		{
-			if (action == GLFW_PRESS)
-			{
-				input->camera->ChangeViewType();
+	//case GLFW_KEY_V:
+	//	if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
+	//	{
+	//		if (action == GLFW_PRESS)
+	//		{
+	//			input->camera->ChangeViewType();
 
-				if (input->camera->GetViewType()) {
-					input->camera->SetInitialDirection(mouseDir);
-				}
-			}
-		}
-		break;
+	//			if (input->camera->GetViewType()) {
+	//				input->camera->SetInitialDirection(mouseDir);
+	//			}
+	//		}
+	//	}
+	//	break;
 	case GLFW_KEY_0:
 		if (input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()/* && !finish*/)
 		{
@@ -160,15 +168,36 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 			}
 		}
 		break;
-		//case GLFW_KEY_1:
-		//	if (camera.Get_start_pos() == 0 && !mainCat->getdying() && !finish)
-		//	{
-		//		if (action == GLFW_PRESS)
-		//		{
-		//			playeranimLib.changeAnimation("Dance", player_CurrentAnim);
-		//		}
-		//	}
-		//	break;
+	case GLFW_KEY_1:
+		if (input->camera->Get_start_pos() == 30.0f)
+		{
+			if (action == GLFW_PRESS)
+			{
+				input->mainCat->SetCharacterType(0);
+				input->graphics->SetCharacterType(0);
+			}
+		}
+		break;
+	case GLFW_KEY_2:
+		if (input->camera->Get_start_pos() == 30.0f)
+		{
+			if (action == GLFW_PRESS)
+			{
+				input->mainCat->SetCharacterType(1);
+				input->graphics->SetCharacterType(1);
+			}
+		}
+		break;
+	case GLFW_KEY_3:
+		if (input->camera->Get_start_pos() == 30.0f)
+		{
+			if (action == GLFW_PRESS)
+			{
+				input->mainCat->SetCharacterType(2);
+				input->graphics->SetCharacterType(2);
+			}
+		}
+		break;
 	case GLFW_KEY_LEFT_ALT:
 		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
 		{
@@ -176,6 +205,20 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 				input->camera->HandleAltKey(true);
 			else if (action == GLFW_RELEASE)
 				input->camera->HandleAltKey(false);
+		}
+		break;
+	case GLFW_KEY_EQUAL:
+		if (action == GLFW_PRESS) {
+			if (mods & GLFW_MOD_SHIFT) {
+				input->soundRef->SetVolume(input->soundRef->GetVolume() + 0.1f);
+				cout << input->soundRef->GetVolume() << "\n";
+			}
+		}
+		break;
+	case GLFW_KEY_MINUS:
+		if (action == GLFW_PRESS) {
+			input->soundRef->SetVolume(input->soundRef->GetVolume() - 0.1f);
+			cout << input->soundRef->GetVolume() << "\n";
 		}
 		break;
 		//case GLFW_KEY_EQUAL:
@@ -208,6 +251,9 @@ void Input::Scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
 
+	if (input->blockInput)
+		return;
+
 	if (input->camera->Get_start_pos() == 0)
 		input->camera->HandleScroll(yoffset);
 }
@@ -215,6 +261,14 @@ void Input::Scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 void Input::MouseMoveFunc(GLFWwindow* window, double xpos, double ypos)
 {
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
+
+	if (input->blockInput)
+		return;
+
+	// mainCat이 없으면 graphics에서 동적으로 가져오기
+	if (!input->mainCat && input->graphics) {
+		input->mainCat = input->graphics->GetLocalCharacter();
+	}
 
 	if (!input->mainCat) return;
 
@@ -254,6 +308,14 @@ void Input::Update(GLFWwindow* window)
 
 void Input::CheckContinuousAttack(GLFWwindow* window)
 {
+	if (blockInput)
+		return;
+
+	// mainCat이 없으면 graphics에서 동적으로 가져오기
+	if (!mainCat && graphics) {
+		mainCat = graphics->GetLocalCharacter();
+	}
+
 	if (!mainCat || mainCat->GetDead()) return;
 
 	bool isMousePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
@@ -278,8 +340,8 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 			else
 			{
 				AnimInfo* currentAnimInfo = mainCat->GetCurrentAnim();
-
-				if (currentAnimInfo->CurrentTime + 50.0f >= currentAnimInfo->Duration)
+				float progress = currentAnimInfo->CurrentTime / currentAnimInfo->Duration;
+				if (progress >= 0.95f)
 				{
 					// 첫 공격 시작
 					isAttacking = true;
@@ -296,8 +358,8 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 			if (isFireAnim)
 			{
 				AnimInfo* currentAnimInfo = mainCat->GetCurrentAnim();
-
-				if (currentAnimInfo->CurrentTime + 50.0f >= currentAnimInfo->Duration)
+				float progress = currentAnimInfo->CurrentTime / currentAnimInfo->Duration;
+				if (progress >= 0.95f)
 				{
 					if (!wasFireAnimation)
 					{

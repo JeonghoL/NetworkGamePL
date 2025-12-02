@@ -14,12 +14,12 @@ void WindowInfo::Init()
 	// 전체화면
 	/*GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-
+	 
 	WIN_W = mode->width;
 	WIN_H = mode->height;
 
 	window = glfwCreateWindow(mode->width, mode->height, basename, monitor, NULL);*/
-
+	
 	// 창모드
 	window = glfwCreateWindow(WIN_W, WIN_H, basename, NULL, NULL);
 

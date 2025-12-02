@@ -19,8 +19,10 @@ public:
 	void Render(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos, glm::mat4 lightSpaceMatrix, GLuint shadowMap);
 	void RenderShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader);
 	void CatBulletUpdateFromServer(float deltaTime);		// 캐릭터용
-	void BulletUpdate();
+	void BulletUpdate(const float deltaTime, const float bulletspeed);
 	void BulletSetting(const glm::vec3 alienPos, const glm::vec3 catPos);
+
+	glm::vec3 GetPosition() const { return position; }
 	void SetPosition(glm::vec3 startPos);
 
 	bool IsCollapsed(AlienCharacter* alien);
