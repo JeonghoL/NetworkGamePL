@@ -1,38 +1,42 @@
 #pragma once
+#include "SceneManager.h"
 
 class Camera;
 class ShadowMapping;
-class Enemy;
 class NetworkManager;
-class Character;
+class MainCharacter;
+class AlienCharacter;
+class SceneManager;
 
 class GraphicsManager
 {
 public:
 	void Init();
-	void Update();
-	void Render(GLFWwindow* window);
-	void RenderShadow();
+	void Update(SceneType type);
+	void Render(GLFWwindow* window, SceneType type);
+	void RenderShadow(SceneType type);
 	void Release();
 
-	void SetMyPlayerID(int id);
-	void AddCharacter(int id, bool isLocal = false);
+	void InitAlienCharacters();
+	void UpdateAlienCharacters(float deltatime);
+
+	void AddCharacter(int id, bool isLocal = false, float speed = 0.1f);
 	void RemoveCharacter(int id);
-	Character* GetCharacter(int id);
-	Character* GetLocalCharacter();
+	MainCharacter* GetCharacter(int id);
+	MainCharacter* GetLocalCharacter();
 
 	Camera* GetCamera() const;
-	Character* GetMainCat();
-	void SetNetworkManager(NetworkManager* net);
+	MainCharacter* GetMainCat();
 	void DebugAllCharacterPositions();
 
-	const std::map<int, Character*>& GetAllCharacters() const { return characters; }
+	const std::map<int, MainCharacter*>& GetAllCharacters() const { return catCharacters; }
+
+	void SetSceneManager(SceneManager* sm);
 
 private:
 	Camera* camera = { nullptr };
 	ShadowMapping* shadowMap = { nullptr };
-	Enemy* enemy[3][9] = { nullptr };
-	NetworkManager* network = { nullptr };
-	std::map<int, Character*> characters;  // 모든 캐릭터 (ID 기반)
-	int myPlayerID = -1;
+	std::map<int, MainCharacter*> catCharacters;  // 모든 캐릭터 (ID 기반)
+	int myPlayerID = { -1 };
+	std::array<std::array<AlienCharacter*, 9>, 3> alienCharacters;
 };

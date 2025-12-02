@@ -159,8 +159,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AlienCharacter.h" />
     <ClInclude Include="BoundingBox.h" />
-    <ClInclude Include="Character.h" />
+    <ClInclude Include="CollisionManager.h" />
+    <ClInclude Include="MainCharacter.h" />
     <ClInclude Include="CrossHair.h" />
     <ClInclude Include="AnimatedModel.h" />
     <ClInclude Include="Bullet.h" />
@@ -174,6 +176,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="RecvBuffer.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="ShadowMapping.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="StaticObject.h" />
@@ -183,8 +186,10 @@
     <ClInclude Include="WindowInfo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AlienCharacter.cpp" />
     <ClCompile Include="BoundingBox.cpp" />
-    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
+    <ClCompile Include="MainCharacter.cpp" />
     <ClCompile Include="CrossHair.cpp" />
     <ClCompile Include="AnimatedModel.cpp" />
     <ClCompile Include="Bullet.cpp" />
@@ -202,6 +207,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="RecvBuffer.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="StaticObject.cpp" />

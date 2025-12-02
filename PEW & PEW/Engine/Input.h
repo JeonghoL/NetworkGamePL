@@ -1,7 +1,8 @@
 #pragma once
+#include "SceneManager.h"
 
 class Camera;
-class Character;
+class MainCharacter;
 class NetworkManager;
 class GraphicsManager;
 
@@ -21,18 +22,19 @@ public:
 	void SendAttackEndPacket();
 
 	void SetCamera(Camera* cam) { camera = cam; }
-	void SetMainCharacter(Character* cat) { mainCat = cat; }
+	void SetMainCharacter(MainCharacter* cat) { mainCat = cat; }
 	void SetNetworkManager(NetworkManager* net) { network = net; }
 	void SetGraphicsManager(GraphicsManager* gfx) { graphics = gfx; }
+	void SetSceneType(SceneType type) { sceneType = type; }
 
 private:
 	Camera* camera = { nullptr };
-	Character* mainCat = { nullptr };
+	MainCharacter* mainCat = { nullptr };
 	NetworkManager* network = { nullptr };
 	GraphicsManager* graphics = { nullptr };
 
 	double lastMouseAngle = { 0.0f };
-	bool isAttacking = false;           // 현재 공격 중인지
-	bool wasFireAnimation = false;      // 이전 프레임이 공격 애니메이션이었는지
-	bool firstAttackSent = false;       // 첫 공격 패킷이 전송되었는지
+	bool isAttacking = { false };           // 현재 공격 중인지
+	bool wasFireAnimation = { false };      // 이전 프레임이 공격 애니메이션이었는지
+	SceneType sceneType;
 };

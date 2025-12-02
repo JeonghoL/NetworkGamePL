@@ -6,7 +6,9 @@
 #include "Camera.h"
 #include "Timer.h"
 #include "NetworkManager.h"
-#include "Character.h"
+#include "MainCharacter.h"
+#include "AlienCharacter.h"
+#include "SceneManager.h"
 
 void GraphicsManager::Init()
 {
@@ -16,43 +18,39 @@ void GraphicsManager::Init()
 	camera = new Camera();
 	shadowMap = new ShadowMapping();
 
-	// 임시 테스트용 로컬 캐릭터 생성
-	//AddCharacter(0, true);  // ID=0, 로컬 플레이어
+	AddCharacter(0, true, 0.1f);
 
-	/*for (int i = 0; i < 3; ++i)
-	{
-		for (int j = 0; j < 9; ++j)
-		{
-			enemy[i][j] = new Enemy(i + 1, j);
-		}
-	}*/
+	InitAlienCharacters();
 }
 
-void GraphicsManager::Update()
+void GraphicsManager::Update(SceneType type)
 {
-	float deltatime = GET_SINGLE(Timer)->GetDeltaTime();
+	float deltaTime = GET_SINGLE(Timer)->GetDeltaTime();
 
 	camera->Update();
 
-	for (auto& [id, character] : characters) {
-		character->Update(deltatime);
-	}
+	int scenetype = static_cast<int>(type);
 
-	/*for (int i = 0; i < 3; ++i)
+	if (type == SceneType::Scene1)
 	{
-		for (int j = 0; j < 9; ++j)
-		{
-			enemy[i][j]->Update(deltatime, mainCat->GetPosition(), enemy[i][j], mainCat);
+		MainCharacter* cat = GetLocalCharacter();
+		cat->Update(deltaTime, alienCharacters);
+		UpdateAlienCharacters(deltaTime);
+	}
+	else
+	{
+		for (auto& [id, character] : catCharacters) {
+			character->Update(deltaTime);
 		}
-	}*/
+	}
 }
 
-void GraphicsManager::Render(GLFWwindow* window)
+void GraphicsManager::Render(GLFWwindow* window, SceneType type)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	float deltatime = GET_SINGLE(Timer)->GetDeltaTime();
 
-	Character* localChar = GetLocalCharacter();
+	MainCharacter* localChar = GetLocalCharacter();
 	if (!localChar) return;  // 로컬 캐릭터가 없으면 렌더링 하지 않음
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIN_W / (float)WIN_H, 0.1f, 1000.0f);
@@ -60,40 +58,43 @@ void GraphicsManager::Render(GLFWwindow* window)
 	glm::vec3 viewPos = camera->GetPosition(localChar->GetPosition());
 	glm::mat4 lightSpaceMatrix = shadowMap->GetLightSpaceMatrix();
 
-	RenderShadow();
+	RenderShadow(type);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Normal Pass 시작
 	GET_SINGLE(Skybox)->Draw(view, projection);
 
 	GET_SINGLE(StaticObjectManager)->Draw(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
 
-	// 모든 캐릭터 렌더링
-	for (auto& [id, character] : characters) {
-		character->Draw(view, projection, viewPos, deltatime, lightSpaceMatrix, shadowMap->GetDepthMap());
-	}
-
-	// 모든 캐릭터의 총알 렌더링 (로컬/원격 구분 없이)
-	for (auto& [id, character] : characters) {
-		character->RenderBullets(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
-	}
-
-	/*for (int i = 0; i < 3; ++i)
+	if (type == SceneType::Scene1)
 	{
-		for (int j = 0; j < 9; ++j)
-		{
-			enemy[i][j]->Draw(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
-			enemy[i][j]->ThrowBullets(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
+		localChar->Draw(view, projection, viewPos, deltatime, lightSpaceMatrix, shadowMap->GetDepthMap());
+		localChar->RenderBullets(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
+
+		for (int type = 0; type < 3; ++type) {
+			for (int location = 0; location < 9; ++location) {
+				if (alienCharacters[type][location] && !alienCharacters[type][location]->GetDead()) {
+					alienCharacters[type][location]->Draw(view, projection, viewPos, deltatime, lightSpaceMatrix, shadowMap->GetDepthMap());
+					alienCharacters[type][location]->DrawBullets(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
+				}
+			}
 		}
-	}*/
+	}
+	else
+	{
+		for (auto& [id, character] : catCharacters) {
+			character->Draw(view, projection, viewPos, deltatime, lightSpaceMatrix, shadowMap->GetDepthMap());
+			character->RenderBullets(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
+		}
+	}
 
 	camera->Render();
 
 	glFinish();
 }
 
-void GraphicsManager::RenderShadow()
+void GraphicsManager::RenderShadow(SceneType type)
 {
-	Character* localChar = GetLocalCharacter();
+	MainCharacter* localChar = GetLocalCharacter();
 	if (!localChar) return;
 
 	shadowMap->UpdateLightSpaceMatrix(localChar->GetPosition());		// Shadow Pass 시작
@@ -102,30 +103,45 @@ void GraphicsManager::RenderShadow()
 
 	glm::mat4 lightSpaceMatrix = shadowMap->GetLightSpaceMatrix();
 
-	// 모든 캐릭터 그림자 렌더링
-	for (auto& [id, character] : characters) {
-		character->DrawShadow(lightSpaceMatrix, shadowMap->GetDepthShaderProgram());
-	}
+	if (type == SceneType::Scene1)
+	{
+		localChar->DrawShadow(lightSpaceMatrix, shadowMap->GetDepthShaderProgram());
 
-	/*for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 9; ++j)
-		{
-			enemy[i][j]->DrawEnemyShadow(shadowMap);
+		for (int type = 0; type < 3; ++type) {
+			for (int location = 0; location < 9; ++location) {
+				if (alienCharacters[type][location] && !alienCharacters[type][location]->GetDead()) {
+					alienCharacters[type][location]->DrawShadow(shadowMap);
+				}
+			}
 		}
-	}*/
+	}
+	else
+	{
+		for (auto& [id, character] : catCharacters) {
+			character->DrawShadow(lightSpaceMatrix, shadowMap->GetDepthShaderProgram());
+		}
+	}
 
 	GET_SINGLE(StaticObjectManager)->DrawShadow(lightSpaceMatrix, shadowMap->GetStaticDepthShaderProgram());
 
-	// 모든 캐릭터의 총알 그림자 렌더링 (로컬/원격 구분 없이)
-	for (auto& [id, character] : characters) {
-		character->RenderBulletsShadow(shadowMap->GetLightSpaceMatrix(), shadowMap->GetStaticDepthShaderProgram());
-	}
+	if (type == SceneType::Scene1)
+	{
+		localChar->RenderBulletsShadow(shadowMap->GetLightSpaceMatrix(), shadowMap->GetStaticDepthShaderProgram());
 
-	/*for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 9; ++j) {
-			enemy[i][j]->DrawEnemyBulletShadow(lightSpaceMatrix, shadowMap->GetStaticDepthShaderProgram());
+		for (int type = 0; type < 3; ++type) {
+			for (int location = 0; location < 9; ++location) {
+				if (alienCharacters[type][location] && !alienCharacters[type][location]->GetDead()) {
+					alienCharacters[type][location]->DrawBulletsShadow(shadowMap->GetLightSpaceMatrix(), shadowMap->GetStaticDepthShaderProgram());
+				}
+			}
 		}
-	}*/
+	}
+	else
+	{
+		for (auto& [id, character] : catCharacters) {
+			character->RenderBulletsShadow(shadowMap->GetLightSpaceMatrix(), shadowMap->GetStaticDepthShaderProgram());
+		}
+	}
 
 	shadowMap->UnbindFramebuffer();
 	glViewport(0, 0, WIN_W, WIN_H);			// Shadow Pass 종료
@@ -137,38 +153,54 @@ void GraphicsManager::Release()
 	GET_SINGLE(StaticObjectManager)->Release();
 
 	// 모든 캐릭터 삭제
-	for (auto& [id, character] : characters) {
+	for (auto& [id, character] : catCharacters) {
 		delete character;
 	}
-	characters.clear();
+	catCharacters.clear();
+
+	for (int type = 0; type < 3; ++type) {
+		for (int location = 0; location < 9; ++location) {
+			if (alienCharacters[type][location]) {
+				delete alienCharacters[type][location];
+				alienCharacters[type][location] = nullptr;
+			}
+		}
+	}
 
 	delete shadowMap;
 	delete camera;
+}
 
-	for (int i = 0; i < 3; ++i)
-	{
-		for (int j = 0; j < 9; ++j)
-			delete enemy[i][j];
+void GraphicsManager::InitAlienCharacters()
+{
+	// 3가지 타입 × 9개 위치 = 27마리 적 생성
+	for (int type = 0; type < 3; ++type) {
+		for (int location = 0; location < 9; ++location) {
+			alienCharacters[type][location] = new AlienCharacter(type, location);
+		}
 	}
 }
 
-void GraphicsManager::SetMyPlayerID(int id)
+void GraphicsManager::UpdateAlienCharacters(float deltatime)
 {
-	myPlayerID = id;
+	MainCharacter* localChar = GetLocalCharacter();
+	if (!localChar) return;  // 로컬 플레이어가 없으면 업데이트 안함
 
-	// 내 캐릭터가 이미 있으면 로컬 플레이어로 설정
-	Character* myChar = GetCharacter(id);
-	if (myChar && myChar->CheckLocal()) {
-		myChar->SetCamera(camera);
+	for (int type = 0; type < 3; ++type) {
+		for (int location = 0; location < 9; ++location) {
+			if (alienCharacters[type][location] && !alienCharacters[type][location]->GetDead()) {
+				alienCharacters[type][location]->Update(deltatime, localChar);
+			}
+		}
 	}
 }
 
-void GraphicsManager::AddCharacter(int id, bool isLocal)
+void GraphicsManager::AddCharacter(int id, bool isLocal, float speed)
 {
-	if (characters.find(id) == characters.end()) {
-		Character* newChar = new Character(id, isLocal);
+	if (catCharacters.find(id) == catCharacters.end()) {
+		MainCharacter* newChar = new MainCharacter(id, isLocal, speed);
 		newChar->Init();
-		characters[id] = newChar;
+		catCharacters[id] = newChar;
 
 		if (isLocal) {
 			myPlayerID = id;
@@ -181,27 +213,27 @@ void GraphicsManager::AddCharacter(int id, bool isLocal)
 
 void GraphicsManager::RemoveCharacter(int id)
 {
-	auto it = characters.find(id);
-	if (it != characters.end()) {
+	auto it = catCharacters.find(id);
+	if (it != catCharacters.end()) {
 		if (it->first == myPlayerID) {
 			myPlayerID = -1;  // 내 캐릭터가 삭제되면 ID 초기화
 		}
 		delete it->second;
-		characters.erase(it);
+		catCharacters.erase(it);
 		std::cout << "[REMOVE CHARACTER] ID: " << id << std::endl;
 	}
 }
 
-Character* GraphicsManager::GetCharacter(int id)
+MainCharacter* GraphicsManager::GetCharacter(int id)
 {
-	auto it = characters.find(id);
-	if (it != characters.end()) {
+	auto it = catCharacters.find(id);
+	if (it != catCharacters.end()) {
 		return it->second;
 	}
 	return nullptr;
 }
 
-Character* GraphicsManager::GetLocalCharacter()
+MainCharacter* GraphicsManager::GetLocalCharacter()
 {
 	if (myPlayerID != -1) {
 		return GetCharacter(myPlayerID);
@@ -214,26 +246,21 @@ Camera* GraphicsManager::GetCamera() const
 	return camera;
 }
 
-Character* GraphicsManager::GetMainCat()
+MainCharacter* GraphicsManager::GetMainCat()
 {
 	return GetLocalCharacter();
-}
-
-void GraphicsManager::SetNetworkManager(NetworkManager* net)
-{
-	network = net;
 }
 
 void GraphicsManager::DebugAllCharacterPositions()
 {
 	std::cout << "\n=== 모든 캐릭터 위치 디버깅 ===" << std::endl;
-	std::cout << "현재 접속 캐릭터 수: " << characters.size() << std::endl;
+	std::cout << "현재 접속 캐릭터 수: " << catCharacters.size() << std::endl;
 	std::cout << "내 플레이어 ID: " << myPlayerID << std::endl;
 	std::cout << "=============================" << std::endl;
 
-	for (auto& pair : characters) {
+	for (auto& pair : catCharacters) {
 		int id = pair.first;
-		Character* character = pair.second;
+		MainCharacter* character = pair.second;
 
 		if (character) {
 			glm::vec3 pos = character->GetPosition();
@@ -259,4 +286,12 @@ void GraphicsManager::DebugAllCharacterPositions()
 		}
 	}
 	std::cout << "=============================\n" << std::endl;
+}
+
+void GraphicsManager::SetSceneManager(SceneManager* sm)
+{
+	MainCharacter* localChar = GetLocalCharacter();
+	if (localChar) {
+		localChar->SetSceneManager(sm);
+	}
 }

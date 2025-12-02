@@ -1,14 +1,16 @@
 #include "pch.h"
 #include "Bullet.h"
 #include "stb_image.h"
-#include "Character.h"
+#include "MainCharacter.h"
 #include "Camera.h"
 #include "Timer.h"
+#include "AlienCharacter.h"
 
-Bullet::Bullet(int type, int i, int j)
+Bullet::Bullet(int type, float speed)
 {
 	SetupShader("Shaders/StaticObjectVert.glsl", "Shaders/StaticObjectFrag.glsl", shaderprogram);
-	SelectBulletType(type, i, j);
+	bulletType = type;
+	SelectBulletType(speed);
 }
 
 Bullet::~Bullet()
@@ -18,26 +20,21 @@ Bullet::~Bullet()
 	glDeleteProgram(shaderprogram);
 }
 
-void Bullet::SelectBulletType(int type, int i, int j)
+void Bullet::SelectBulletType(float speed)
 {
-	if (type == 1)
+	if (bulletType == 1)
 	{
 		LoadBulletGLB("StaticGlb/dagger.glb");
 		Texture = LoadBulletTexture("Texture/dagger.png");
-		b_type = type;
-		bulletSpeed = 20.0f;
+		bulletSpeed = speed;
 	}
-	else if (type == 2)
+	else if (bulletType == 2)
 	{
 		LoadBulletGLB("StaticGlb/star.glb");
 		Texture = LoadBulletTexture("Texture/star.png");
-		b_type = type;
-		enemy_i = i;
-		enemy_j = j;
-		bulletSpeed = 0.3f;
+		bulletSpeed = speed;
 	}
 }
-
 
 void Bullet::LoadBulletGLB(const std::string& filename) {
 	const aiScene* scene = objectImporter.ReadFile(filename,
@@ -148,38 +145,36 @@ GLuint Bullet::LoadBulletTexture(const char* path)
 	return textureID;
 }
 
-void Bullet::BulletSetting(Character* character, Camera* camera, glm::vec3 mousePick)
+void Bullet::BulletSetting(MainCharacter* character, Camera* camera, glm::vec3 mousePick)
 {
-	if (b_type == 1)
-	{
-		position = character->GetPosition();
-		position.y = 0.45f;
+	position = character->GetPosition();
+	position.y = 0.45f;
 
-		float angle = atan2(mouseDir.x, mouseDir.z);
+	float angle = atan2(mouseDir.x, mouseDir.z);
 
-		if (!camera->GetViewType()) {
+	if (!camera->GetViewType()) {
 
-			position.x += cos(angle) * 0.2f;
-			position.z -= sin(angle) * 0.2f;
+		position.x += cos(angle) * 0.2f;
+		position.z -= sin(angle) * 0.2f;
 
-			glm::vec3 targetPos = mousePick;
-			targetPos.y = 0.45f;
-			direction = glm::normalize(targetPos - position);
-		}
-		else {
-			float horizontalAngle = camera->GetHorizontalAngle();
-			float verticalAngle = camera->GetVerticalAngle();
-
-			direction = glm::vec3(
-				sin(horizontalAngle) * cos(verticalAngle),
-				-sin(verticalAngle),
-				cos(horizontalAngle) * cos(verticalAngle)
-			);
-		}
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, position);
+		glm::vec3 targetPos = mousePick;
+		targetPos.y = 0.45f;
+		direction = glm::normalize(targetPos - position);
 	}
+	else {
+		float horizontalAngle = camera->GetHorizontalAngle();
+		float verticalAngle = camera->GetVerticalAngle();
+
+		direction = glm::vec3(
+			sin(horizontalAngle) * cos(verticalAngle),
+			-sin(verticalAngle),
+			cos(horizontalAngle) * cos(verticalAngle)
+		);
+	}
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, position);
+
 }
 
 void Bullet::Render(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos,
@@ -227,7 +222,7 @@ void Bullet::RenderShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader)
 	glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-void Bullet::BulletUpdate(float deltaTime)
+void Bullet::CatBulletUpdateFromServer(float deltaTime)
 {
 	glm::vec3 dir = targetPos - position;
 	float dist = glm::length(dir);
@@ -240,11 +235,31 @@ void Bullet::BulletUpdate(float deltaTime)
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, position);
+	model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
+}
 
-	if (b_type == 1)
+void Bullet::BulletUpdate()
+{
+	position += direction * bulletSpeed;
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, position);
+
+	if (bulletType == 1)
 		model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
-	else if (b_type == 2)
+	else if (bulletType == 2)
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+}
+
+void Bullet::BulletSetting(const glm::vec3 alienPos, const glm::vec3 catPos)
+{
+	position = alienPos;
+	position.y = 0.45f;
+
+	targetPos = catPos;
+	targetPos.y = 0.45f;
+	direction = glm::normalize(targetPos - position);
+	position += 0.8f * direction;
 }
 
 void Bullet::SetPosition(glm::vec3 startPos)
@@ -253,9 +268,60 @@ void Bullet::SetPosition(glm::vec3 startPos)
 
 	if (glm::length(position - targetPos) > 2.0f)
 		position = targetPos;
+}
 
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, position);
+bool Bullet::IsCollapsed(AlienCharacter* alien)
+{
+	bool check{ false };
 
-	model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
+	/*for (int i = 0; i < 70; ++i)
+	{
+		if (min_Z[i] <= position.z && max_Z[i] >= position.z)
+		{
+			if (position.x <= max_X[i] && position.x > min_X[i])
+				check = true;
+		}
+	}*/
+
+	glm::vec3 pos = alien->GetPosition();
+	if (position.y >= 0.0f && position.y <= 0.95f)
+	{
+		if ((position.x >= pos.x - 0.25f && position.x <= pos.x + 0.25f) &&
+			(position.z >= pos.z - 0.2f && position.z <= pos.z + 0.2f))
+		{
+			return true;
+		}
+	}
+
+	return check;
+}
+
+bool Bullet::IsCollapsed(MainCharacter* Cat)
+{
+	bool check{ false };
+
+	/*for (int i = 0; i < 70; ++i)
+	{
+		if (min_Z[i] <= position.z && max_Z[i] >= position.z)
+		{
+			if (position.x <= max_X[i] && position.x > min_X[i])
+				check = true;
+		}
+	}*/
+
+	glm::vec3 pos = Cat->GetPosition();
+
+	if (!Cat->GetDead())
+	{
+		if (position.y >= 0.0f && position.y <= 0.95f)
+		{
+			if ((position.x >= pos.x - 0.25f && position.x <= pos.x + 0.25f) &&
+				(position.z >= pos.z - 0.2f && position.z <= pos.z + 0.2f))
+			{
+				return true;
+			}
+		}
+	}
+
+	return check;
 }
