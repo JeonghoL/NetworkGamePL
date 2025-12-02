@@ -26,3 +26,7 @@ PEW & PEW/x64/Release/Client.exe
 
 PEW & PEW Server/.vs/
 /PEW & PEW Server/x64/Debug
+PEW & PEW Server/Binary/Debug/Pew&Pew Server.exe
+PEW & PEW Server/Libraries/Debug/Pew&Pew ServerCore.lib
+PEW & PEW Server/PEW & PEW Server/x64/Debug/Pew&Pew Server.pch
+PEW & PEW Server/PEW & PEW ServerCore/x64/Debug/Pew&Pew ServerCore.pch
