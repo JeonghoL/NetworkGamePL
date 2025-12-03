@@ -30,15 +30,8 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		if (action == GLFW_PRESS)
 			input->camera->SetStart(true);
 		break;
-		//case GLFW_KEY_Q:
-		//	if ((!(input->camera->Get_start_pos() == 0) && !input->mainCat->GetDead())/* || finish*/)
-		//	{
-		//		if (action == GLFW_PRESS)
-		//			glfwSetWindowShouldClose(window, GL_TRUE);
-		//	}
-		//	break;
 	case GLFW_KEY_LEFT_SHIFT:
-		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
+		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()))
 		{
 			if (action == GLFW_PRESS)
 			{
@@ -59,7 +52,6 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		{
 			if (action == GLFW_PRESS)
 			{
-				//input->graphics->DebugAllCharacterPositions();
 				if (input->sceneType == SceneType::Scene1)
 					input->mainCat->GoToEndPosition();
 			}
@@ -83,7 +75,7 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		}
 		break;
 	case GLFW_KEY_A:
-		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
+		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()))
 		{
 			if (action == GLFW_PRESS)
 			{
@@ -100,7 +92,7 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		}
 		break;
 	case GLFW_KEY_W:
-		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
+		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()))
 		{
 			if (action == GLFW_PRESS)
 			{
@@ -117,7 +109,7 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		}
 		break;
 	case GLFW_KEY_S:
-		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
+		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()))
 		{
 			if (action == GLFW_PRESS)
 			{
@@ -134,7 +126,7 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		}
 		break;
 	case GLFW_KEY_H:
-		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
+		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()))
 		{
 			if (action == GLFW_PRESS)
 			{
@@ -145,21 +137,8 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 			}
 		}
 		break;
-		//case GLFW_KEY_V:
-		//	if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
-		//	{
-		//		if (action == GLFW_PRESS)
-		//		{
-		//			input->camera->ChangeViewType();
-
-		//			if (input->camera->GetViewType()) {
-		//				input->camera->SetInitialDirection(mouseDir);
-		//			}
-		//		}
-		//	}
-		//	break;
 	case GLFW_KEY_0:
-		if (input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()/* && !finish*/)
+		if (input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())
 		{
 			if (action == GLFW_PRESS)
 			{
@@ -199,7 +178,7 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 		}
 		break;
 	case GLFW_KEY_LEFT_ALT:
-		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead())/* || finish*/)
+		if ((input->camera->Get_start_pos() == 0 && !input->mainCat->GetDead()))
 		{
 			if (action == GLFW_PRESS)
 				input->camera->HandleAltKey(true);
@@ -221,29 +200,6 @@ void Input::KeyBoardInput(GLFWwindow* window, int key, int scancode, int action,
 			cout << input->soundRef->GetVolume() << "\n";
 		}
 		break;
-		//case GLFW_KEY_EQUAL:
-		//	if (action == GLFW_PRESS)
-		//	{
-		//		if (mods == GLFW_MOD_SHIFT)
-		//		{
-		//			if (soundVol < 1.0f)
-		//			{
-		//				soundVol += 0.05f;
-		//				std::cout << "Sound: " << soundVol << std::endl;
-		//			}
-		//		}
-		//	}
-		//	break;
-		//case GLFW_KEY_MINUS:
-		//	if (action == GLFW_PRESS)
-		//	{
-		//		if (soundVol > 0.0f)
-		//		{
-		//			soundVol -= 0.05f;
-		//			std::cout << "Sound: " << soundVol << std::endl;
-		//		}
-		//	}
-		//	break;
 	}
 }
 
@@ -265,7 +221,6 @@ void Input::MouseMoveFunc(GLFWwindow* window, double xpos, double ypos)
 	if (input->blockInput)
 		return;
 
-	// mainCat이 없으면 graphics에서 동적으로 가져오기
 	if (!input->mainCat && input->graphics) {
 		input->mainCat = input->graphics->GetLocalCharacter();
 	}
@@ -311,7 +266,6 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 	if (blockInput)
 		return;
 
-	// mainCat이 없으면 graphics에서 동적으로 가져오기
 	if (!mainCat && graphics) {
 		mainCat = graphics->GetLocalCharacter();
 	}
@@ -335,7 +289,6 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 					SendAttackPacket();
 				else
 					mainCat->SetFiring(true);
-				//cout << "first attack packet has send" << '\n';
 			}
 			else
 			{
@@ -349,7 +302,6 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 						SendAttackPacket();
 					else
 						mainCat->SetFiring(true);
-					//cout << "first attack packet has send" << '\n';
 				}
 			}
 		}
@@ -368,7 +320,6 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 						else
 							mainCat->SetFiring(true);
 						wasFireAnimation = true;
-						//cout << "continuous attack packet has send" << '\n';
 					}
 				}
 				else
@@ -388,7 +339,6 @@ void Input::CheckContinuousAttack(GLFWwindow* window)
 				SendAttackEndPacket();
 			else
 				mainCat->SetFiring(false);
-			//cout << "attack end packet has send" << '\n';
 
 			// 상태 초기화
 			isAttacking = false;

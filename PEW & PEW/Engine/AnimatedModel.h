@@ -124,7 +124,6 @@ struct VertexBoneData {
 
 class AnimatedModel
 {
-	// public protected private
 public:
 	struct AnimationLibrary {
 		void LoadAnimation(const std::string& name, const std::string& filename, vector<unique_ptr<Assimp::Importer>>& importers, AnimatedModel* model);

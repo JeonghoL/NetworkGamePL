@@ -11,11 +11,6 @@ void Fade::Init()
     CreateQuad();
 }
 
-void Fade::Update()
-{
-
-}
-
 void Fade::Render(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& cameraPos, const glm::vec3& frontDir)
 {
     if (fadeAlpha <= 0.0f) return;

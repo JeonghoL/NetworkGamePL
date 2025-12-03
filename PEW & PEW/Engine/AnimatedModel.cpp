@@ -56,9 +56,6 @@ void AnimatedModel::LoadGLBFile(int j, vector<BoneInfo>& BoneInfoName, const std
 	}
 
 	Parse_Scene(scene);
-	//CheckBoneHierarchy(scene->mRootNode);		// 본 계층구조 확인함수
-	//PrintBoneHierarchy(scene->mRootNode);
-	//checkFileAnimation(scene);		// T-pose 캐릭터 파일에 애니메이션 있는지 확인
 
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
 		const aiMesh* mesh = scene->mMeshes[i];
@@ -74,7 +71,6 @@ void AnimatedModel::LoadGLBFile(int j, vector<BoneInfo>& BoneInfoName, const std
 	for (unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 
-		// 텍스처 좌표 추출 (동일)
 		std::vector<float> texCoords;
 		if (mesh->HasTextureCoords(0)) {
 			for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -170,8 +166,6 @@ void AnimatedModel::LoadGLBFile(int j, vector<BoneInfo>& BoneInfoName, const std
 	glEnableVertexAttribArray(4);
 
 	glBindVertexArray(0);
-
-	//std::cout << "File loaded: " << filename << std::endl;
 }
 
 void AnimatedModel::NormalizeBoneWeights()
@@ -530,7 +524,6 @@ void AnimatedModel::AnimationLibrary::LoadAnimation(const std::string& name, con
 	}
 	else
 		cout << "Unloaded animation: " << name << endl;
-	//cout << "File loaded: " << filename << '\n';
 }
 
 void AnimatedModel::AnimationLibrary::ChangeAnimation(const std::string& name, AnimInfo& currentAnim)

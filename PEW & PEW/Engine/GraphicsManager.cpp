@@ -136,8 +136,6 @@ void GraphicsManager::Render(SceneType type, SoundManager& soundmanager)
 		{
 			endRenderTimer -= deltatime;
 
-			//cout << "RealEnd Time Left: " << endRenderTimer << '\n';
-
 			if (endRenderTimer <= 0.0f)
 			{
 				GLFWwindow* window = GET_SINGLE(WindowInfo)->GetWindow();

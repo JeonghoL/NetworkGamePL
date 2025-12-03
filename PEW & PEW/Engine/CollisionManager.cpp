@@ -29,8 +29,6 @@ void CollisionManager::Init()
 
 	in.close();
 	initialized = true;
-
-	//cout << "충돌체 저장 완료!" << '\n';
 }
 
 bool CollisionManager::IsInsideCollisionBox(float x, float z)

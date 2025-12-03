@@ -106,8 +106,6 @@ void Bullet::LoadBulletGLB(const std::string& filename) {
 	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
-
-	//cout << "File loaded: " << filename << '\n';
 }
 
 GLuint Bullet::LoadBulletTexture(const char* path)
@@ -274,15 +272,6 @@ bool Bullet::IsCollapsed(AlienCharacter* alien)
 {
 	bool check{ false };
 
-	/*for (int i = 0; i < 70; ++i)
-	{
-		if (min_Z[i] <= position.z && max_Z[i] >= position.z)
-		{
-			if (position.x <= max_X[i] && position.x > min_X[i])
-				check = true;
-		}
-	}*/
-
 	glm::vec3 pos = alien->GetPosition();
 	if (position.y >= 0.0f && position.y <= 0.95f)
 	{
@@ -299,15 +288,6 @@ bool Bullet::IsCollapsed(AlienCharacter* alien)
 bool Bullet::IsCollapsed(MainCharacter* Cat)
 {
 	bool check{ false };
-
-	/*for (int i = 0; i < 70; ++i)
-	{
-		if (min_Z[i] <= position.z && max_Z[i] >= position.z)
-		{
-			if (position.x <= max_X[i] && position.x > min_X[i])
-				check = true;
-		}
-	}*/
 
 	glm::vec3 pos = Cat->GetPosition();
 

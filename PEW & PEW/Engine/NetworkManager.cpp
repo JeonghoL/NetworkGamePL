@@ -57,56 +57,6 @@ void NetworkManager::Init(const char* IP, u_short port)
 
 void NetworkManager::Update()
 {
-	//// 1. read set 초기화, socket Setting
-	//fd_set readSet;
-	//FD_ZERO(&readSet);
-	//FD_SET(clientSocket, &readSet);
-
-	//// 2. timeout 설정, Select
-	//timeval timeout{ 0, 0 }; // Non-Blocking Select를 위해 timeout 0으로 설정
-	//if (select(0, &readSet, nullptr, nullptr, &timeout) <= 0) {
-	//	return;
-	//}
-
-	//// 3. Recv 가능한지 판별, 가능하면 Recv 진행
-	//if (FD_ISSET(clientSocket, &readSet)) {
-	//	char tempBuffer[1024];
-	//	int recvLen = recv(clientSocket, tempBuffer, sizeof(tempBuffer), 0);
-	//	if (recvLen <= 0) {
-	//		Release();
-	//		return;
-	//	}
-
-	//	if (not recvBuffer.Write(tempBuffer, recvLen)) {
-	//		std::cerr << "[RecvBuffer] Write failed or Overflow\n";
-	//		return;
-	//	}
-
-	//	while (true) {
-	//		if (recvBuffer.GetUsedSize() < sizeof(unsigned char)) {
-	//			break;
-	//		}
-
-	//		unsigned char packetSize{ 0 };
-	//		if (not recvBuffer.Peek(reinterpret_cast<char*>(&packetSize), sizeof(unsigned char))) {
-	//			break;
-	//		}
-
-	//		if (packetSize <= 0 or packetSize > BUFFER_SIZE) {
-	//			std::cerr << "Invalid Packet Size : " << packetSize << std::endl;
-	//			break;
-	//		}
-
-	//		std::vector<char> packet(packetSize);
-	//		if (not recvBuffer.Read(packet.data(), packetSize)) {
-	//			std::cerr << "RecvBuffer Read Failed\n";
-	//			break;
-	//		}
-
-	//		ProcessPacket(packet);
-	//	}
-	//}
-
 	if (not isConnected) {
 		return;
 	}
@@ -239,9 +189,6 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 				if (character) {
 					glm::vec3 startPos(addPacket.x, addPacket.y, addPacket.z);
 					character->CreateBulletFromServer(addPacket.id, startPos);
-
-					/*std::cout << "[ADD BULLET] ID: " << addPacket.id << " Owner: " << ownerID
-						<< " at (" << addPacket.x << ", " << addPacket.y << ", " << addPacket.z << ")" << std::endl;*/
 				}
 			}
 		}
@@ -258,7 +205,6 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 				if (character) {
 					character->UpdateFromPacket(movePacket.angle, movePacket.x, movePacket.y, movePacket.z, -1, movePacket.isMove, movePacket.isRun);
 				}
-				//cout << movePacket.id << " : Move packet" << " Move packet : " << movePacket.isMove << '\n';
 			}
 			else {
 				// 총알 이동 처리 - 모든 캐릭터에서 해당 총알 찾기
@@ -272,11 +218,6 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 						break;
 					}
 				}
-
-				/*if (bulletFound) {
-					std::cout << "[MOVE BULLET] ID: " << movePacket.id
-						<< " to (" << movePacket.x << ", " << movePacket.y << ", " << movePacket.z << ")" << std::endl;
-				}*/
 			}
 		}
 		break;
@@ -293,7 +234,6 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 			{
 				bool bulletFound = false;
 
-				// 모든 캐릭터를 순회하면서 해당 총알 ID 찾기
 				for (auto& [id, character] : graphics->GetAllCharacters()) {
 					if (character->RemoveBulletFromServer(removePacket.id)) {
 						bulletFound = true;
@@ -302,8 +242,6 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 				}
 			}
 		}
-
-		//std::cout << "[REMOVE PLAYER] ID: " << removePacket.id << std::endl;
 		break;
 	}
 	case SC_ATTACK:
@@ -313,7 +251,6 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 		if (graphics) {
 			MainCharacter* character = graphics->GetCharacter(attackPacket.id);
 			if (character) {
-				//std::cout << "[ATTACK] Player ID: " << attackPacket.id << std::endl;
 				character->SetFiring(true);
 			}
 		}
@@ -326,7 +263,6 @@ void NetworkManager::ProcessPacket(const std::vector<char>& packet)
 		if (graphics) {
 			MainCharacter* character = graphics->GetCharacter(attackEndPacket.id);
 			if (character) {
-				//std::cout << "[ATTACKEND] Player ID: " << attackEndPacket.id << std::endl;
 				character->SetFiring(false);
 			}
 		}

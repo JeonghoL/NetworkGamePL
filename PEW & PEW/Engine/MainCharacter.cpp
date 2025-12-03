@@ -108,7 +108,6 @@ void MainCharacter::Draw(glm::mat4 view, glm::mat4 projection, glm::vec3 viewPos
     if (dead)
         return;
 
-    // 로컬 플레이어만 히트박스 렌더링
     if (isLocalPlayer && GetHitBox())
         hitbox->RenderHitbox(angle, characterPos, view, projection);
 
@@ -179,7 +178,6 @@ void MainCharacter::DrawShadow(const glm::mat4& lightSpaceMatrix, GLuint depthSh
 
 void MainCharacter::RenderBullets(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos, glm::mat4 lightSpaceMatrix, GLuint shadowMap)
 {
-    // 모든 캐릭터의 총알 렌더링 (로컬/원격 구분 없이)
     for (int i = 0; i < MAX_BULLETS; ++i) {
         if (bullets[i].isActive && bullets[i].bullet) {
             bullets[i].bullet->Render(orgview, orgproj, viewPos, lightSpaceMatrix, shadowMap);
@@ -189,7 +187,6 @@ void MainCharacter::RenderBullets(const glm::mat4& orgview, const glm::mat4& org
 
 void MainCharacter::RenderBulletsShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader)
 {
-    // 모든 캐릭터의 총알 그림자 렌더링 (로컬/원격 구분 없이)
     for (int i = 0; i < MAX_BULLETS; ++i) {
         if (bullets[i].isActive && bullets[i].bullet) {
             bullets[i].bullet->RenderShadow(lightSpaceMatrix, depthShader);
@@ -207,9 +204,6 @@ void MainCharacter::CreateBulletFromServer(int bulletID, glm::vec3 startPos)
 
             // 서버에서 받은 위치와 방향으로 설정
             bullets[i].bullet->SetPosition(startPos);
-
-            /*std::cout << "[CREATE BULLET FROM SERVER] Player: " << playerID
-                << ", Bullet ID: " << bulletID << ", Slot: " << i << std::endl;*/
             return;
         }
     }
@@ -222,8 +216,6 @@ bool MainCharacter::RemoveBulletFromServer(int bulletID)
             bullets[i].bulletID = -1;
             bullets[i].isActive = false;
 
-            /*std::cout << "[REMOVE BULLET FROM SERVER] Player: " << playerID
-                << ", Bullet ID: " << bulletID << ", Slot: " << i << std::endl;*/
             return true;
         }
     }
@@ -342,7 +334,6 @@ void MainCharacter::CreateLocalBullet()
 
             glm::vec3 mousePick = camera->GetMousePicking(cur_x, cur_y, projection, view);
             bullets[i].bullet->BulletSetting(this, camera, mousePick);
-            //cout << i << "번째 총알 생성!!" << '\n';
             return;
         }
     }
@@ -425,7 +416,6 @@ void MainCharacter::CheckBulletWallHit(int bulletIndex)
     if (GET_SINGLE(CollisionManager)->IsInsideCollisionBox(bulletPos.x, bulletPos.z))
     {
         bullets[bulletIndex].isActive = false;
-        //cout << bulletIndex << "번째 총알 삭제!!" << '\n';
     }
 }
 
@@ -452,7 +442,6 @@ void MainCharacter::CheckLocalEnd(array<array<AlienCharacter*, 9>, 3>& aliens)
 {
     if (characterPos.x < -42.0f && characterPos.z < -49.0f)
     {
-        // Ending
         for (int type = 0; type < 3; ++type) {
             for (int location = 0; location < 9; ++location) {
                 if (!aliens[type][location]->GetDying())

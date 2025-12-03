@@ -78,8 +78,6 @@ void StaticObjectManager::Update(const float deltaTime)
 	if ((currentPlayerState == PlayerPVPState::WIN || currentPlayerState == PlayerPVPState::LOSE) && endTimer > 0.0f) {
 		endTimer -= deltaTime;
 
-		//cout << "EndTimer: " << endTimer << endl;
-
 		if (endTimer <= 0.0f)
 		{
 			if (!endingScene)

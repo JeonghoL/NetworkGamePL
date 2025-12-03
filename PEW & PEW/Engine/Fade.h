@@ -4,7 +4,6 @@ class Fade
 {
 public:
 	void Init();
-	void Update();
 	void Render(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& cameraPos, const glm::vec3& frontDir);
 	void Release();
 

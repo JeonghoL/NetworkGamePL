@@ -104,7 +104,7 @@ void Camera::HandleMouseMovement(double cur_x, double cur_y) {
 
 void Camera::HandleScroll(double yoffset)
 {
-    if (!FirstPersonView /*&& !finish*/)
+    if (!FirstPersonView)
     {
         if (yoffset == -1)
         {
@@ -132,9 +132,6 @@ void Camera::Starting(SoundManager& soundmanager, const float deltaTime)
         start_pos = 0.0f;
 
         soundmanager.ChangeBGM("music/chipi.mp3");
-        //startbgm->setIsPaused(true);
-        //basebgm->setIsPaused(false);
-        //cloud_go = true;
     }
 }
 
@@ -181,20 +178,11 @@ glm::mat4 Camera::Get3rdPersonViewMatrix(const glm::vec3& targetPos) {
             );
         }
         else {
-            //if (!finish)
-            //{
             return glm::lookAt(
                 glm::vec3(targetPos.x + ((targetPos.x * 0.6f) * (start_pos / 30.0f)), 10.0f * Rm + (5.5f * (start_pos / 30.0f)), targetPos.z + 5.0f * Rm + ((targetPos.z * 0.35f) * (start_pos / 30.0f))),
                 glm::vec3(targetPos.x - (targetPos.x * (start_pos / 30.0f)), 0.0f + (3.5f * (start_pos / 30.0f)), targetPos.z - (targetPos.z * (start_pos / 30.0f))),
                 glm::vec3(0.0f, 1.0f, 0.0f)
             );
-            //}
-            //else
-                //return glm::lookAt(
-                //    glm::vec3(-44.0f - (finish_pos / 2.0f), 10.0f * Rm + (finish_pos / 4.0f), -50.5f + 5.0f * Rm - (finish_pos / 2.0f)),
-                //    glm::vec3(-44.0f + (44.0f * (finish_pos / 30.0f)), 0.0f + (finish_pos / 30.0f), -50.5f + (50.5f * (finish_pos / 30.0f))),
-                //    glm::vec3(0.0f, 1.0f, 0.0f)
-                //);
         }
     }
     else
@@ -277,15 +265,6 @@ glm::vec3 Camera::GetFrontVector(const glm::vec3& targetPos)
         }
     }
 }
-
-//void Camera::addfinishpos()
-//{
-//    if (finish_pos < 30.0f)
-//        finish_pos += 0.01f;
-//
-//    if (finish_pos > 30.0f)
-//        finish_pos = 30.0f;
-//}
 
 void Camera::SetInitialDirection(const glm::vec3& direction)
 {

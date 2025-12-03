@@ -500,7 +500,6 @@ void AlienCharacter::CheckBulletWallHit(int bulletIndex)
 	if (GET_SINGLE(CollisionManager)->IsInsideCollisionBox(bulletPos.x, bulletPos.z))
 	{
 		bullets[bulletIndex].isActive = false;
-		//cout << bulletIndex << "번째 총알 삭제!!" << '\n';
 	}
 }
 
