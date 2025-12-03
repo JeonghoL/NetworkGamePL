@@ -12,6 +12,7 @@
 #include "SceneManager.h"
 #include "Fade.h"
 #include "EffectManager.h"
+#include "WindowInfo.h"
 
 void GraphicsManager::Init()
 {
@@ -22,11 +23,6 @@ void GraphicsManager::Init()
 	shadowMap = new ShadowMapping();
 	fade = new Fade();
 	fade->Init();
-
-	effect = new EffectManager();
-	effect->Init();
-
-	effect->PlayEffect("CandleFire", glm::vec3{ -35.0322f, 2.0f, 44.6548f });
 
 	glm::vec3 localPos = glm::vec3(-37.3051f, 0.0f, 42.5001f);
 	AddCharacter(0, localPos, 0, true, 0.1f);
@@ -64,8 +60,6 @@ void GraphicsManager::Update(SceneType type, SoundManager& soundmanager, const f
 
 		GET_SINGLE(StaticObjectManager)->Update(deltaTime);
 	}
-
-	effect->Update(deltaTime);
 
 	UpdateLightAngle(deltaTime);
 }
@@ -110,20 +104,49 @@ void GraphicsManager::Render(SceneType type, SoundManager& soundmanager)
 				}
 			}
 		}
+
+		if (localChar->GetEffects()) {
+			localChar->GetEffects()->Render(view, projection);  // 캐릭터 이펙트
+		}
 	}
 	else
 	{
 		for (auto& [id, character] : catCharacters) {
 			character->Draw(view, projection, viewPos, deltatime, lightSpaceMatrix, shadowMap->GetDepthMap());
 			character->RenderBullets(view, projection, viewPos, lightSpaceMatrix, shadowMap->GetDepthMap());
+
+			EffectManager* characterEffects = character->GetEffects();
+			if (characterEffects) {
+				characterEffects->Render(view, projection);
+			}
+		}
+
+		static bool endingScene = false;
+		if (GET_SINGLE(StaticObjectManager)->GetEndingState() && !endingScene)
+		{
+			camera->SetEnding(true);
+			localChar->GetEffects()->PlayEffect("Fireworks", glm::vec3(-10.0f, 0, -10.0f));
+			localChar->GetEffects()->PlayEffect("Fireworks", glm::vec3(-10.0f, 0, 10.0f));
+			localChar->GetEffects()->PlayEffect("Fireworks", glm::vec3(10.0f, 0, 10.0f));
+			localChar->GetEffects()->PlayEffect("Fireworks", glm::vec3(10.0f, 0, -10.0f));
+			endingScene = true;
+		}
+
+		if (endingScene)
+		{
+			endRenderTimer -= deltatime;
+
+			//cout << "RealEnd Time Left: " << endRenderTimer << '\n';
+
+			if (endRenderTimer <= 0.0f)
+			{
+				GLFWwindow* window = GET_SINGLE(WindowInfo)->GetWindow();
+				glfwSetWindowShouldClose(window, GL_TRUE);
+			}
 		}
 	}
 
 	camera->Render();
-
-	glm::vec3 cameraFront = camera->GetFrontVector(localChar->GetPosition());
-	glm::vec3 cameraTarget = viewPos + cameraFront;
-	effect->Render(viewPos, cameraTarget);
 
 	RenderFade(projection, view, viewPos);
 
@@ -144,7 +167,7 @@ void GraphicsManager::RenderFade(const glm::mat4& projection, const glm::mat4& v
 		glm::vec3 frontDir = camera->GetFrontVector(localChar->GetPosition());
 		fade->Render(projection, view, viewPos, frontDir);
 	}
-	
+
 }
 
 void GraphicsManager::RenderShadow(SceneType type)
@@ -227,9 +250,6 @@ void GraphicsManager::Release()
 
 	fade->Release();
 	delete fade;
-
-	effect->Release();
-	delete effect;
 }
 
 void GraphicsManager::ReleaseScene1()
@@ -359,7 +379,7 @@ void GraphicsManager::DebugAllCharacterPositions()
 	std::cout << "=============================\n" << std::endl;
 }
 
-void GraphicsManager::SetSceneManager(SceneManager* sm) 
+void GraphicsManager::SetSceneManager(SceneManager* sm)
 {
 	MainCharacter* localChar = GetLocalCharacter();
 	if (localChar) {

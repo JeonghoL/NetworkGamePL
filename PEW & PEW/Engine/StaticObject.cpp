@@ -88,8 +88,6 @@ void StaticObject::LoadStaticObjectGLB(const std::string& filename) {
 	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
-
-	cout << "File loaded: " << filename << '\n';
 }
 
 void StaticObject::drawStaticobject(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos,
@@ -126,90 +124,6 @@ void StaticObject::drawStaticobject(const glm::mat4& orgview, const glm::mat4& o
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
 }
-
-//void StaticObject::drawcloud(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos,
-//	glm::mat4 lightSpaceMatrix, GLuint shadowMap)
-//{
-//	glUseProgram(shaderprogram);
-//	ViewLoc = glGetUniformLocation(shaderprogram, "view");
-//	glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &orgview[0][0]);
-//	ProjLoc = glGetUniformLocation(shaderprogram, "projection");
-//	glUniformMatrix4fv(ProjLoc, 1, GL_FALSE, &orgproj[0][0]);
-//	if (cloud_go)
-//	{
-//		if (cloud_pos_z < 118.0f) {
-//			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.01f));
-//			cloud_pos_z += 0.01f;
-//		}
-//		else
-//		{
-//			model = glm::translate(model, glm::vec3(0.0f, 0.0f, -236.0f));
-//			cloud_pos_z -= 236.0f;
-//		}
-//	}
-//	ModelLoc = glGetUniformLocation(shaderprogram, "model");
-//	glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
-//
-//	glUniformMatrix4fv(glGetUniformLocation(shaderprogram, "lightSpaceMatrix"),
-//		1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-//
-//	glActiveTexture(GL_TEXTURE1);
-//	glBindTexture(GL_TEXTURE_2D, shadowMap);
-//	glUniform1i(glGetUniformLocation(shaderprogram, "shadowMap"), 1);
-//
-//	GLuint lightPosLoc = glGetUniformLocation(shaderprogram, "lightPos");
-//	GLuint viewPosLoc = glGetUniformLocation(shaderprogram, "viewPos");
-//	glm::vec3 lightPos{ -37.3051f - (1000.0f * cos(light_angle)), 0.0f + 1000.0f, 42.5001f + (1000.0f * sin(light_angle)) };
-//	glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
-//	glUniform3fv(viewPosLoc, 1, glm::value_ptr(viewPos));
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, Texture);
-//	glUniform1i(glGetUniformLocation(shaderprogram, "objTexture"), 0);
-//	glUniform1i(glGetUniformLocation(shaderprogram, "useobjTexture"), 1);
-//	glBindVertexArray(VAO);
-//	glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
-//}
-
-//void StaticObject::drawEnd(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos,
-//	glm::mat4 lightSpaceMatrix, GLuint shadowMap)
-//{
-//	glUseProgram(shaderprogram);
-//	ViewLoc = glGetUniformLocation(shaderprogram, "view");
-//	glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, &orgview[0][0]);
-//	ProjLoc = glGetUniformLocation(shaderprogram, "projection");
-//	glUniformMatrix4fv(ProjLoc, 1, GL_FALSE, &orgproj[0][0]);
-//	if (!send_end)
-//	{
-//		model = glm::translate(model, glm::vec3(0.0f, end_y, 0.0f));
-//		send_end = true;
-//	}
-//	if (finish && (end_y < 0.0f))
-//	{
-//		model = glm::translate(model, glm::vec3(0.0f, 0.005f, 0.0f));
-//		end_y += 0.005f;
-//	}
-//	ModelLoc = glGetUniformLocation(shaderprogram, "model");
-//	glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(model));
-//
-//	glUniformMatrix4fv(glGetUniformLocation(shaderprogram, "lightSpaceMatrix"),
-//		1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-//
-//	glActiveTexture(GL_TEXTURE1);
-//	glBindTexture(GL_TEXTURE_2D, shadowMap);
-//	glUniform1i(glGetUniformLocation(shaderprogram, "shadowMap"), 1);
-//
-//	GLuint lightPosLoc = glGetUniformLocation(shaderprogram, "lightPos");
-//	GLuint viewPosLoc = glGetUniformLocation(shaderprogram, "viewPos");
-//	glm::vec3 lightPos{ -37.3051f - (1000.0f * cos(light_angle)), 0.0f + 1000.0f, 42.5001f + (1000.0f * sin(light_angle)) };
-//	glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPos));
-//	glUniform3fv(viewPosLoc, 1, glm::value_ptr(viewPos));
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, Texture);
-//	glUniform1i(glGetUniformLocation(shaderprogram, "objTexture"), 0);
-//	glUniform1i(glGetUniformLocation(shaderprogram, "useobjTexture"), 1);
-//	glBindVertexArray(VAO);
-//	glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
-//}
 
 void StaticObject::drawStaticobjectShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader)
 {

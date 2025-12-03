@@ -1,23 +1,5 @@
 #pragma once
 
-// vt
-//class IA
-//{
-//public: 
-//};
-//
-//class B : public IA
-//{
-//
-//};
-//
-//class C : public IA
-//{
-//
-//};
-
-// vector<long long*> s = 
-
 class SoundManager;
 class CrossHair;
 
@@ -38,14 +20,12 @@ public:
     glm::vec3 GetMouseWorldDirection(float cur_x, float cur_y, const glm::mat4& projection, const glm::mat4& view, const glm::vec3& targetPos);
 
     bool IsAltPressed() const { return LeftAlt_on; }
-    //float getZoomLevel() const { return Rm; }
     float GetHorizontalAngle() const { return camera_horizontal_angle; }
     float GetVerticalAngle() const { return camera_vertical_angle; }
     float Get_start_pos() const { return start_pos; }
     glm::vec3 GetMousePicking(float mouseX, float mouseY, const glm::mat4& projection, const glm::mat4& view);
     glm::vec3 GetFrontVector(const glm::vec3& targetPos);
 
-    //void addfinishpos();
     void SetInitialDirection(const glm::vec3& direction);
 
     void ChangeViewType() { FirstPersonView = !FirstPersonView; }
@@ -61,13 +41,9 @@ public:
     void SetAngle();
     void SetAngle(float ang);
     void SetStart(bool in) { start = in; }
+    void SetEnding(bool in) { ending = in; }
 
 private:
-    // Camera camera;
-    // LeftAlt_on
-
-    // 멤버 변수는 헤더에 초기화하는 것을 추천.
-
     float Rm = { 1.0f };
     bool LeftAlt_on = { false };
     bool first_click = { false };
@@ -87,4 +63,6 @@ private:
 
     CrossHair* fpscrosshair;
     CrossHair* tpscrosshair;
+
+    bool ending = { false };
 };

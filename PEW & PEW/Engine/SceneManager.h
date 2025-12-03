@@ -32,7 +32,7 @@ private:
     void ReleaseScene2();
 
     void SendLoginPacket(int characterType);
-    
+
     void SetPlayerState(PlayerPVPState state);
 
 private:
@@ -50,7 +50,7 @@ private:
     PlayerPVPState currentPlayerState = PlayerPVPState::WAITING;
 
     float readyToFightTimer = 0.0f;
-    const float READY_TO_FIGHT_DELAY = 1.0f; 
+    const float READY_TO_FIGHT_DELAY = 1.0f;
     bool waitingForFightTransition = false;
 };
 

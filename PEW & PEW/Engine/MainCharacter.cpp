@@ -7,6 +7,7 @@
 #include "AlienCharacter.h"
 #include "SceneManager.h"
 #include "CollisionManager.h"
+#include "EffectManager.h"
 
 MainCharacter::MainCharacter(int id, glm::vec3 cPos, bool isLocal, float speed) : playerID(id), isLocalPlayer(isLocal)
 {
@@ -16,7 +17,12 @@ MainCharacter::MainCharacter(int id, glm::vec3 cPos, bool isLocal, float speed) 
     animLibrary = new AnimatedModel::AnimationLibrary();
 
     if (isLocalPlayer)
+    {
         hitbox = new BoundingBox();
+    }
+
+    effects = new EffectManager();
+    effects->Init();
 
     characterPos = cPos;
     targetPos = characterPos;
@@ -33,6 +39,11 @@ MainCharacter::~MainCharacter()
     delete player_CurrentAnim;
     delete player_BoneInfo;
     delete animModel;
+
+    if (effects) {
+        delete effects;
+        effects = nullptr;
+    }
 
     if (animLibrary != nullptr) {
         delete animLibrary;
@@ -70,14 +81,21 @@ void MainCharacter::Update(float deltaTime)
     UpdateAnimation();
     UpdateHitDecision(deltaTime);
     UpdateBulletsFromServer(deltaTime);
+    CheckFootEffectTiming();
+    if (effects) {
+        effects->Update(deltaTime);
+    }
 }
 
 void MainCharacter::Update(float deltaTime, array<array<AlienCharacter*, 9>, 3>& aliens)
 {
-   
     UpdateLocalPlayerState();
     UpdateLocalPlayerMovement(deltaTime);
     CheckFireAnimationTiming();
+    CheckFootEffectTiming();
+    if (effects) {
+        effects->Update(deltaTime);
+    }
     UpdateLocalBullets(aliens, deltaTime);
     UpdateAnimation();
     UpdateHitDecision(deltaTime);
@@ -312,7 +330,7 @@ void MainCharacter::UpdateLocalBullets(array<array<AlienCharacter*, 9>, 3>& alie
     }
 }
 
-void MainCharacter::CreateLocalBullet() 
+void MainCharacter::CreateLocalBullet()
 {
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIN_W / (float)WIN_H, 0.1f, 1000.0f);
     glm::mat4 view = camera->GetViewMatrix(characterPos);
@@ -324,13 +342,13 @@ void MainCharacter::CreateLocalBullet()
 
             glm::vec3 mousePick = camera->GetMousePicking(cur_x, cur_y, projection, view);
             bullets[i].bullet->BulletSetting(this, camera, mousePick);
-            cout << i << "번째 총알 생성!!" << '\n';
+            //cout << i << "번째 총알 생성!!" << '\n';
             return;
         }
     }
 }
 
-void MainCharacter::CheckFireAnimationTiming() 
+void MainCharacter::CheckFireAnimationTiming()
 {
     std::string currentAnim = animLibrary->GetCurrentAnimation();
     if (currentAnim == "Fire" || currentAnim == "FireWalk" || currentAnim == "FireRun") {
@@ -340,11 +358,11 @@ void MainCharacter::CheckFireAnimationTiming()
             CreateLocalBullet();
             localBulletFired[0] = true;
         }
-        else if (progress >= 0.65f && !localBulletFired[1]) {  
+        else if (progress >= 0.65f && !localBulletFired[1]) {
             CreateLocalBullet();
             localBulletFired[1] = true;
         }
-        else if (progress >= 0.75f && !localBulletFired[2]) {  
+        else if (progress >= 0.75f && !localBulletFired[2]) {
             CreateLocalBullet();
             localBulletFired[2] = true;
         }
@@ -355,12 +373,42 @@ void MainCharacter::CheckFireAnimationTiming()
     }
 }
 
-void MainCharacter::CheckBulletAlienHit(int bulletIndex, array<array<AlienCharacter*, 9>, 3>& aliens) 
+void MainCharacter::CheckFootEffectTiming()
+{
+    std::string currentAnim = animLibrary->GetCurrentAnimation();
+    if (currentAnim == "Walk" || currentAnim == "Run" || currentAnim == "FireWalk" || currentAnim == "FireRun") {
+        float progress = player_CurrentAnim->CurrentTime / player_CurrentAnim->Duration;
+
+        if (progress >= 0.1f && progress < 0.2f && !footPrinted[0])
+        {
+            effects->PlayEffect("FootSmoke", characterPos);
+            footPrinted[0] = true;
+        }
+        else if (progress >= 0.6f && progress < 0.7f && !footPrinted[1])
+        {
+            effects->PlayEffect("FootSmoke", characterPos);
+            footPrinted[1] = true;
+        }
+
+        if (progress >= 0.95f) {
+            footPrinted[0] = footPrinted[1] = false;
+        }
+    }
+    else
+    {
+        if (footPrinted[0] || footPrinted[1])
+            footPrinted[0] = footPrinted[1] = false;
+    }
+}
+
+void MainCharacter::CheckBulletAlienHit(int bulletIndex, array<array<AlienCharacter*, 9>, 3>& aliens)
 {
     for (int type = 0; type < 3; ++type) {
         for (int location = 0; location < 9; ++location) {
             if (aliens[type][location] && !aliens[type][location]->GetDying()) {
                 if (bullets[bulletIndex].bullet->IsCollapsed(aliens[type][location])) {
+                    glm::vec3 pos = bullets[bulletIndex].bullet->GetPosition();
+                    effects->PlayEffect("Hit", pos);
                     bullets[bulletIndex].isActive = false;
                     aliens[type][location]->SetHit();
                     return;  // 충돌 발생
@@ -377,7 +425,7 @@ void MainCharacter::CheckBulletWallHit(int bulletIndex)
     if (GET_SINGLE(CollisionManager)->IsInsideCollisionBox(bulletPos.x, bulletPos.z))
     {
         bullets[bulletIndex].isActive = false;
-        cout << bulletIndex << "번째 총알 삭제!!" << '\n';
+        //cout << bulletIndex << "번째 총알 삭제!!" << '\n';
     }
 }
 
@@ -458,11 +506,30 @@ void MainCharacter::UpdateHitDecision(const float deltaTime)
     }
 }
 
-void MainCharacter::SetHit()
+EffectManager* MainCharacter::GetEffects() const
+{
+    return effects;
+}
+
+void MainCharacter::SetHit(const glm::vec3& pos)
 {
     life -= 1;
     hit_cnt = 2.0f;
     hitcolor = glm::vec4(1.0f, 0.6f, 0.6f, 1.0f);
+    effects->PlayEffect("Hit2", pos);
+}
+
+glm::vec3 MainCharacter::GetFireEffectPosition() const
+{
+    glm::vec3 position = characterPos;
+    position.y = 0.45f;
+
+    float angle = atan2(mouseDir.x, mouseDir.z);
+
+    position.x += cos(angle) * 0.2f;
+    position.z -= sin(angle) * 0.2f;
+
+    return position;
 }
 
 void MainCharacter::SaveAnimations()
@@ -673,6 +740,9 @@ void MainCharacter::ReviveFromPacket(float x, float y, float z)
 
 void MainCharacter::DamagedFromPacket()
 {
+    glm::vec3 pos = characterPos;
+    pos.y += 0.45f;
+    effects->PlayEffect("Hit", pos);
     hit_cnt = 2.0f;
     hitcolor = glm::vec4(1.0f, 0.6f, 0.6f, 1.0f);
 }

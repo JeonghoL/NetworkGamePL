@@ -87,9 +87,6 @@
     <ClInclude Include="CrossHair.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="RecvBuffer.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="PacketFactory.h">
       <Filter>Protocol</Filter>
     </ClInclude>
@@ -171,9 +168,6 @@
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="CrossHair.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="RecvBuffer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="PacketFactory.cpp">

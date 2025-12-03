@@ -11,8 +11,6 @@ public:
 	void drawStaticobject(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos,
 		glm::mat4 lightSpaceMatrix, GLuint shadowMap);
 
-	//void drawcloud(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos, glm::mat4 lightSpaceMatrix, GLuint shadowMap);
-	//void drawEnd(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos, glm::mat4 lightSpaceMatrix, GLuint shadowMap);
 	void drawStaticobjectShadow(const glm::mat4& lightSpaceMatrix, GLuint depthShader);
 
 	void MoveStaticobject(const float deltaTime);

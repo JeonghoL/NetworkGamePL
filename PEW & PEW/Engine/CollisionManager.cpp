@@ -2,7 +2,7 @@
 #include "CollisionManager.h"
 
 void CollisionManager::Init()
-{ 
+{
 	if (initialized)
 	{
 		cout << "이미 충돌체들 저장됨!" << '\n';
@@ -26,10 +26,10 @@ void CollisionManager::Init()
 			collisionBoxes.emplace_back(min_x, max_x, min_z, max_z);
 		}
 	}
-	
+
 	in.close();
-	initialized = true;	
-	
+	initialized = true;
+
 	//cout << "충돌체 저장 완료!" << '\n';
 }
 

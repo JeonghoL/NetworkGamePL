@@ -1,5 +1,4 @@
 #pragma once
-#include "RecvBuffer.h"
 
 class GraphicsManager;
 

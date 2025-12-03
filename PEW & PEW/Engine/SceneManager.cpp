@@ -73,7 +73,7 @@ void SceneManager::TransitionUpdate(const float deltaTime)
 			soundRef->PlayBGM();
 		}
 	}
-	else if (waitingForFightTransition) 
+	else if (waitingForFightTransition)
 	{
 		readyToFightTimer -= deltaTime;
 		if (readyToFightTimer <= 0.0f) {
@@ -150,7 +150,7 @@ void SceneManager::InitScene2(int characterType)
 
 void SceneManager::UpdateScene1()
 {
-	
+
 }
 
 void SceneManager::UpdateScene2()

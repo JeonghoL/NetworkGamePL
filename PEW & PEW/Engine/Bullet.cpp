@@ -107,7 +107,7 @@ void Bullet::LoadBulletGLB(const std::string& filename) {
 
 	glBindVertexArray(0);
 
-	cout << "File loaded: " << filename << '\n';
+	//cout << "File loaded: " << filename << '\n';
 }
 
 GLuint Bullet::LoadBulletTexture(const char* path)
@@ -174,7 +174,7 @@ void Bullet::BulletSetting(MainCharacter* character, Camera* camera, glm::vec3 m
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, position);
-	
+
 }
 
 void Bullet::Render(const glm::mat4& orgview, const glm::mat4& orgproj, glm::vec3 viewPos,
@@ -322,6 +322,6 @@ bool Bullet::IsCollapsed(MainCharacter* Cat)
 			}
 		}
 	}
-	
+
 	return check;
 }

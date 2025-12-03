@@ -1,6 +1,6 @@
 #pragma once
 
-struct CollisionBox 
+struct CollisionBox
 {
 	float minX, maxX, minZ, maxZ;
 

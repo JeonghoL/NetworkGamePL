@@ -427,21 +427,21 @@ void AlienCharacter::MoveToward(MainCharacter* Cat, const float deltaTime, const
 	glm::vec3 movement = finalDirection * Move_SPEED * deltaTime;
 
 	if (distance > 0.1f) {
-        glm::vec3 newPos = alienPos + movement;
+		glm::vec3 newPos = alienPos + movement;
 
-        if (!GET_SINGLE(CollisionManager)->IsInsideCollisionBox(newPos.x, newPos.z))
-            alienPos = newPos;
-        else
-        {
-            auto* collisionManager = GET_SINGLE(CollisionManager);
+		if (!GET_SINGLE(CollisionManager)->IsInsideCollisionBox(newPos.x, newPos.z))
+			alienPos = newPos;
+		else
+		{
+			auto* collisionManager = GET_SINGLE(CollisionManager);
 
-            if (movement.x != 0 && !collisionManager->IsInsideCollisionBox(alienPos.x + movement.x, alienPos.z))
-                alienPos.x += movement.x;
+			if (movement.x != 0 && !collisionManager->IsInsideCollisionBox(alienPos.x + movement.x, alienPos.z))
+				alienPos.x += movement.x;
 
-            if (movement.z != 0 && !collisionManager->IsInsideCollisionBox(alienPos.x, alienPos.z + movement.z))
-                alienPos.z += movement.z;
-        }
-    }
+			if (movement.z != 0 && !collisionManager->IsInsideCollisionBox(alienPos.x, alienPos.z + movement.z))
+				alienPos.z += movement.z;
+		}
+	}
 
 	if (distance <= 4.0f)
 	{
@@ -485,7 +485,7 @@ void AlienCharacter::UpdateBullets(MainCharacter* Cat, const float deltaTime)
 			if (bullets[i].bullet->IsCollapsed(Cat))
 			{
 				bullets[i].isActive = false;
-				Cat->SetHit();
+				Cat->SetHit(bullets[i].bullet->GetPosition());
 			}
 
 			CheckBulletWallHit(i);
@@ -500,7 +500,7 @@ void AlienCharacter::CheckBulletWallHit(int bulletIndex)
 	if (GET_SINGLE(CollisionManager)->IsInsideCollisionBox(bulletPos.x, bulletPos.z))
 	{
 		bullets[bulletIndex].isActive = false;
-		cout << bulletIndex << "번째 총알 삭제!!" << '\n';
+		//cout << bulletIndex << "번째 총알 삭제!!" << '\n';
 	}
 }
 

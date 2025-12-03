@@ -32,7 +32,6 @@ void StaticObjectManager::Init()
 	AddStaticObject("StaticGlb/cloud.glb", "Texture/cloud.png", "Cloud");
 	AddStaticObject("StaticGlb/cave.glb", "Texture/cave.png", "Cave");
 	AddStaticObject("StaticGlb/startlogo.glb", "Texture/startlogo.png", "Startlogo");
-	AddStaticObject("StaticGlb/gameclear.glb", "Texture/gameclear.png", "GameClear");
 }
 
 void StaticObjectManager::InitPVPMap()
@@ -60,7 +59,7 @@ void StaticObjectManager::Update(const float deltaTime)
 	for (auto& obj : StaticObjects)
 	{
 		if (obj->GetName() == "Cloud")
-		{	
+		{
 			cloudPosition += 1.0f * deltaTime;
 			obj->MoveStaticobject(deltaTime);
 
@@ -79,12 +78,12 @@ void StaticObjectManager::Update(const float deltaTime)
 	if ((currentPlayerState == PlayerPVPState::WIN || currentPlayerState == PlayerPVPState::LOSE) && endTimer > 0.0f) {
 		endTimer -= deltaTime;
 
-		cout << "EndTimer: " << endTimer << endl;
+		//cout << "EndTimer: " << endTimer << endl;
 
 		if (endTimer <= 0.0f)
 		{
-			GLFWwindow* window = GET_SINGLE(WindowInfo)->GetWindow();
-			glfwSetWindowShouldClose(window, GL_TRUE);
+			if (!endingScene)
+				endingScene = true;
 		}
 	}
 }
@@ -145,7 +144,7 @@ void StaticObjectManager::UpdatePVPPlayerPosition(const glm::vec3& pos)
 
 			glm::vec3 textPos = pos;
 			textPos.y += 4.5f;
-			textPos.z += 3.0f;  
+			textPos.z += 3.0f;
 
 			obj->SetPosition(textPos);
 
@@ -163,7 +162,7 @@ void StaticObjectManager::SetPlayerState(PlayerPVPState state)
 	currentPlayerState = state;
 
 	if (state == PlayerPVPState::FIGHT) {
-		fightTextTimer = FIGHT_TEXT_DURATION; 
+		fightTextTimer = FIGHT_TEXT_DURATION;
 	}
 
 	if (state == PlayerPVPState::WIN || state == PlayerPVPState::LOSE) {
@@ -193,4 +192,9 @@ bool StaticObjectManager::ShouldRenderStateText(const std::string& textName) con
 	default:
 		return false;
 	}
+}
+
+bool StaticObjectManager::GetEndingState() const
+{
+	return endingScene;
 }

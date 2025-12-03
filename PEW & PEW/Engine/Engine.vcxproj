@@ -177,7 +177,6 @@
     <ClInclude Include="PacketFactory.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="protocol.h" />
-    <ClInclude Include="RecvBuffer.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="ShadowMapping.h" />
     <ClInclude Include="Skybox.h" />
@@ -211,7 +210,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="RecvBuffer.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
     <ClCompile Include="Skybox.cpp" />
