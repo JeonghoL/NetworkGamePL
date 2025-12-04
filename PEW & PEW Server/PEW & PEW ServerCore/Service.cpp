@@ -40,7 +40,6 @@ bool Service::Init()
 	return true;
 }
 
-
 void Service::Start()
 {
 	_running = true;

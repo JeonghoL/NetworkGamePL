@@ -16,10 +16,8 @@ int main()
 
 	service->Start();
 
-	//std::cout << "종료하려면 Enter 키를 누르세요...\n";
-	//std::cin.get();
+	std::cout << "종료하려면 Enter 키를 누르세요...\n";
+	std::cin.get();
 
 	service->Stop();
-
-	return 0;
 }
