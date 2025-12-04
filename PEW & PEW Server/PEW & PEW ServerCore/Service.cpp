@@ -50,19 +50,14 @@ void Service::Start()
 		FD_ZERO(&readSet);
 
 		FD_SET(_listener->GetSocket(), &readSet);
-		SOCKET maxSocket = _listener->GetSocket();
 
 		for (auto& session : _sessMng->GetSessionList()) {
 			SOCKET socket = session->GetSocket();
 			FD_SET(socket, &readSet);
-
-			if (socket > maxSocket) {
-				maxSocket = socket;
-			}
 		}
 
 		timeval timeout = { 0, 10000 };
-		if (SOCKET_ERROR == select(static_cast<int>(maxSocket + 1), &readSet, nullptr, nullptr, &timeout)) {
+		if (SOCKET_ERROR == select(0, &readSet, nullptr, nullptr, &timeout)) {
 			continue;
 		}
 
