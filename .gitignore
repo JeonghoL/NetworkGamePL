@@ -30,3 +30,6 @@ PEW & PEW Server/Binary/Debug/Pew&Pew Server.exe
 PEW & PEW Server/Libraries/Debug/Pew&Pew ServerCore.lib
 PEW & PEW Server/PEW & PEW Server/x64/Debug/Pew&Pew Server.pch
 PEW & PEW Server/PEW & PEW ServerCore/x64/Debug/Pew&Pew ServerCore.pch
+PEW & PEW Server/PEW & PEW Server/x64/Release/Pew&Pew Server.iobj
+PEW & PEW Server/PEW & PEW Server/x64/Release/Pew&Pew Server.pch
+PEW & PEW Server/PEW & PEW ServerCore/x64/Release/Pew&Pew ServerCore.pch
