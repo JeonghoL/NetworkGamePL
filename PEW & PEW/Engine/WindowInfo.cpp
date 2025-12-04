@@ -5,7 +5,7 @@
 unsigned int WIN_W = 800;
 unsigned int WIN_H = 600;
 unsigned int WIN_X = 0;
-unsigned int WIN_Y = 0;
+unsigned int WIN_Y = 0; 
 
 void WindowInfo::Init()
 {

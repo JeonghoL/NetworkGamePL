@@ -13,6 +13,13 @@ void SessionManager::AcceptSession(SOCKET clientSocket)
 		return;
 	}
 
+	int flag = 1;
+	if (SOCKET_ERROR == setsockopt(clientSocket, IPPROTO_TCP, TCP_NODELAY,
+		(const char*)&flag, sizeof(flag))) 
+	{
+		printf("setsockopt TCP_NODELAY failed: %d\n", WSAGetLastError());
+	}
+
 	int sessionId = GenerateSessionId();
 	if (sessionId == -1) {
 		closesocket(clientSocket);

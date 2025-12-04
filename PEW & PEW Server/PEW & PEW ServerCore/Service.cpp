@@ -35,7 +35,7 @@ bool Service::Init()
 	}
 
 	_timerMng->AddRepeatedTask([this](float deltaTime) { _gameLogic->LogicUpdate(deltaTime); }, 4.16f);
-	_timerMng->AddRepeatedTask([this](float) { _gameLogic->NetworkUpdate(); }, 16.66f);
+	_timerMng->AddRepeatedTask([this](float) { _gameLogic->NetworkUpdate(); }, 33.0f);
 
 	return true;
 }
