@@ -129,7 +129,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\External\include;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;$(ProjectDir);C:\EffekseerForCpp170e\src\Effekseer;C:\EffekseerForCpp170e\src\EffekseerRendererCommon;C:\EffekseerForCpp170e\src\EffekseerRendererGL</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\External\include;$(SolutionDir)Engine\External\include\FMOD;$(ProjectDir);$(SolutionDir)Engine\External\include\Effekseer;$(SolutionDir)Engine\External\include\EffekseerRendererCommon;$(SolutionDir)Engine\External\include\EffekseerRendererGL</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -148,7 +148,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Engine\External\include;C:\Program Files (x86)\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;$(ProjectDir);C:\EffekseerForCpp170e\src\Effekseer;C:\EffekseerForCpp170e\src\EffekseerRendererCommon;C:\EffekseerForCpp170e\src\EffekseerRendererGL</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\External\include;$(SolutionDir)Engine\External\include\FMOD;$(ProjectDir);$(SolutionDir)Engine\External\include\Effekseer;$(SolutionDir)Engine\External\include\EffekseerRendererCommon;$(SolutionDir)Engine\External\include\EffekseerRendererGL</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
